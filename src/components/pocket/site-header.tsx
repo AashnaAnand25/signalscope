@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Settings,
   Building2,
+  ScanSearch,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export const NAV = [
   { to: "/feedback", label: "Collect feedback" },
   { to: "/data", label: "Data workspace" },
   { to: "/company", label: "Company workspace" },
+  { to: "/research", label: "PERLab research" },
 ] as const;
 
 function ProvenanceBadge() {
@@ -185,10 +187,12 @@ export function SiteHeader() {
     MessageSquare,
     Settings,
     Building2,
+    ScanSearch,
   ];
   const [trailOpen, setTrailOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const companyMode = pathname.startsWith("/company");
+  const researchMode = pathname === "/research";
   const links = NAV.map((n, i) => (
     <Link
       key={n.to}
@@ -249,14 +253,16 @@ export function SiteHeader() {
       <header className="workspace-topbar">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Consumer intelligence
+            {companyMode || researchMode ? "Kearney PERLab hackathon" : "Consumer intelligence"}
           </p>
           <p className="text-sm font-semibold">
             {NAV.find((n) => n.to === pathname)?.label ?? "Workspace"}
           </p>
         </div>
         <div>
-          {companyMode ? (
+          {researchMode ? (
+            <span className="text-sm font-semibold">Public sources · Local research brief</span>
+          ) : companyMode ? (
             <span className="text-sm font-semibold">Shared company pilot</span>
           ) : (
             <>

@@ -25,4 +25,4 @@ The public pages do **not** reveal a client catalog, raw customer passages, BOM,
 4. Test data: eligible population, assignment method, variant, time window, orders or choice outcomes, and measurement owner.
 5. Deployment: approved identity provider, hosting, access scope, retention and deletion requirements.
 
-The new shared API supports the workflow manually; automated client connectors and an approved AI extraction gateway are not configured. Kearney's public site cannot authorize access to a client's private systems.
+The new shared API supports the workflow manually; automated private-client connectors are not configured. Optional server-side Gemini analysis and the public-source competitor workbench are implemented; they do not constitute an approved private-client AI gateway. Kearney's public site cannot authorize access to a client's private systems.

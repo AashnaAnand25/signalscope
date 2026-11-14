@@ -1422,3 +1422,37 @@ html[data-motion="reduced"] *::after {
   max-height: 480px;
   overflow: auto;
 }
+.research-input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid var(--input);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--foreground);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.competitor-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  background: var(--paper);
+  font-size: 13px;
+}
+.competitor-table th,
+.competitor-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  min-width: 160px;
+}
+.competitor-table thead {
+  background: var(--muted);
+}
+.workspace-sidebar nav {
+  max-height: calc(100dvh - 300px);
+  overflow-y: auto;
+}

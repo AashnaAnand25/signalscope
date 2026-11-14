@@ -18,6 +18,7 @@ import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as OpportunitiesRouteImport } from './routes/opportunities'
+import { Route as ResearchRouteImport } from './routes/research'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const OpportunitiesRoute = OpportunitiesRouteImport.update({
   path: '/opportunities',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResearchRoute = ResearchRouteImport.update({
+  id: '/research',
+  path: '/research',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
   '/opportunities': typeof OpportunitiesRoute
+  '/research': typeof ResearchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
   '/opportunities': typeof OpportunitiesRoute
+  '/research': typeof ResearchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
   '/opportunities': typeof OpportunitiesRoute
+  '/research': typeof ResearchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/journey'
     | '/opportunities'
+    | '/research'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/journey'
     | '/opportunities'
+    | '/research'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/journey'
     | '/opportunities'
+    | '/research'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   JourneyRoute: typeof JourneyRoute
   OpportunitiesRoute: typeof OpportunitiesRoute
+  ResearchRoute: typeof ResearchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpportunitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/research': {
+      id: '/research'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   JourneyRoute: JourneyRoute,
   OpportunitiesRoute: OpportunitiesRoute,
+  ResearchRoute: ResearchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

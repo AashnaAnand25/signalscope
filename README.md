@@ -66,3 +66,7 @@ Open [interactive code graph](graphify-out/graph.html) or [graph report](graphif
 ## Teammate work
 
 See [backend/data handoff](docs/TEAMMATE_BACKEND_PROMPT.md) for the original implementation brief. A server-side Gemini integration is included for the demo routes; see [AI and Google Cloud setup](docs/AI_SETUP.md). The company pilot uses its independent Bun/SQLite API and human review; connecting AI extraction to private company records requires an approved gateway and access design.
+
+## PERLab source and competitor research
+
+Open `/research` to capture public HTML pages or permitted excerpts, discover competing product sources, compare two to four models with source-quote checks, and export a PERLab handoff brief. Public references cover Velocity AI, Tariff Simulator, Ingredient Compass and AEPD; they are not live proprietary integrations. See [web research workflow](docs/WEB_RESEARCH.md) and [competitive positioning](docs/COMPETITIVE_POSITIONING.md).
