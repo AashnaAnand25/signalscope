@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ResearchAgent } from "@/components/research-agent";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/pocket/page-intro";
@@ -125,13 +126,13 @@ function DataWorkspace() {
           </p>
         )}
       </section>
+      <ResearchAgent />
       <section className="workspace-notice">
         <strong>Research boundary</strong>
         <p>
-          The example is synthetic. For real passages, set origin to collected, supply a sourceUrl
-          or sourceReference, and set codingStatus to human-reviewed or ai-suggested as appropriate.
-          Verify codings against the source. Only add data you are allowed to use. No automatic
-          scraping or live AI analysis is connected.
+          Real passages need a source URL or reference. Verify AI-suggested tags against the
+          original. Gemini requires a server key. Velocity requires an authorized export; no direct
+          connector is configured.
         </p>
       </section>
     </div>

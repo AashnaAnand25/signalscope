@@ -32,7 +32,7 @@ export const Route = createFileRoute("/journey")({
       {
         name: "description",
         content:
-          "A branching customer journey showing what is observed, self-reported, inferred or unknown — and who is missing.",
+          "A branching customer journey showing what is observed, self-reported, inferred or unknown; and who is missing.",
       },
       { property: "og:title", content: "Journey & coverage · SignalScope" },
       {
@@ -69,8 +69,8 @@ function JourneyPage() {
     <div className="space-y-12">
       <PageIntro
         eyebrow="Journey & coverage"
-        title="Where the evidence reaches — and where it doesn't"
-        description="People move through overlapping, repeating states. Each stop shows what we can count, how, and what remains unknown."
+        title="Journey coverage"
+        description="Measured stages. Visible gaps."
         guide={{
           points: [
             "Stops aren't exclusive: one person can be in several states, and loops (↻) can repeat.",
@@ -261,7 +261,7 @@ function JourneyPage() {
                         How to reach them: {m.reach}
                       </span>
                       <span className="block text-xs text-navy-foreground/70">
-                        Population size: unknown — not estimated.
+                        Population size: unknown; not estimated.
                       </span>
                     </span>
                   ) : (

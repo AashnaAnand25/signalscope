@@ -3,18 +3,18 @@ import type { EvidenceRecord, ProductConfig, SurveyResponse } from "@/lib/types"
 
 /**
  * Demo product: a FICTIONAL backpack. Every record below is synthetic demonstration
- * evidence written for this prototype — not findings about a real product, and not
+ * evidence written for this prototype; not findings about a real product, and not
  * quotes from real people. Source IDs are fictional and there are no source URLs.
  */
 const P = "campus-everyday-backpack";
 
 const evidence: EvidenceRecord[] = [
-  // ——— Laptop fit / compatibility ———
+  //; ;; Laptop fit / compatibility; ;;
   {
     id: "SYN-R01",
     productId: P,
     sourceType: "review",
-    text: "I need a bag that fits a 16-inch laptop, but I don't want it to feel huge. Mine fits — barely. The zipper strains around the corners.",
+    text: "I need a bag that fits a 16-inch laptop, but I don't want it to feel huge. Mine fits, barely. The zipper strains around the corners.",
     date: "2026-03-04",
     journey: "use",
     journeyBasis: "stated",
@@ -166,7 +166,7 @@ const evidence: EvidenceRecord[] = [
     id: "SYN-Q03",
     productId: P,
     sourceType: "qa",
-    text: "Would this hold a 13-inch tablet and a keyboard case together? — Reply in thread: the sleeve is about 1.5 in deep.",
+    text: "Would this hold a 13-inch tablet and a keyboard case together? Reply in thread: the sleeve is about 1.5 in deep.",
     date: "2026-06-08",
     answered: true,
     codings: [
@@ -205,12 +205,12 @@ const evidence: EvidenceRecord[] = [
     origin: "synthetic-seed",
   },
 
-  // ——— Comfort vs lightweight ———
+  //; ;; Comfort vs lightweight; ;;
   {
     id: "SYN-R04",
     productId: P,
     sourceType: "review",
-    text: "The straps are thick and padded — after a two-mile walk my shoulders feel fine. It's heavier than my old bag, and I'm OK with that.",
+    text: "The straps are thick and padded; after a two-mile walk my shoulders feel fine. It's heavier than my old bag, and I'm OK with that.",
     date: "2026-03-22",
     journey: "use",
     journeyBasis: "stated",
@@ -279,7 +279,7 @@ const evidence: EvidenceRecord[] = [
     origin: "synthetic-seed",
   },
 
-  // ——— Price ———
+  //; ;; Price; ;;
   {
     id: "SYN-D04",
     productId: P,
@@ -360,7 +360,7 @@ const evidence: EvidenceRecord[] = [
     origin: "synthetic-seed",
   },
 
-  // ——— Rain protection ———
+  //; ;; Rain protection; ;;
   {
     id: "SYN-Q05",
     productId: P,
@@ -429,7 +429,7 @@ const evidence: EvidenceRecord[] = [
     origin: "synthetic-seed",
   },
 
-  // ——— Pocket workaround / convenience ———
+  //; ;; Pocket workaround / convenience; ;;
   {
     id: "SYN-R08",
     productId: P,
@@ -480,7 +480,7 @@ const evidence: EvidenceRecord[] = [
     origin: "synthetic-seed",
   },
 
-  // ——— Repairability / sustainability ———
+  //; ;; Repairability / sustainability; ;;
   {
     id: "SYN-R09",
     productId: P,
@@ -548,12 +548,12 @@ const evidence: EvidenceRecord[] = [
     origin: "synthetic-seed",
   },
 
-  // ——— Size & appearance (contradictory) ———
+  //; ;; Size & appearance (contradictory); ;;
   {
     id: "SYN-R10",
     productId: P,
     sourceType: "review",
-    text: "Love the orange — easy to spot in a pile of bags. Slim enough that it doesn't look like I'm going hiking.",
+    text: "Love the orange; easy to spot in a pile of bags. Slim enough that it doesn't look like I'm going hiking.",
     date: "2026-02-25",
     journey: "use",
     journeyBasis: "stated",
@@ -636,7 +636,7 @@ const evidence: EvidenceRecord[] = [
     id: "SYN-R12",
     productId: P,
     sourceType: "review",
-    text: "Plenty of room — I fit a lunch, a hoodie and two textbooks. Bigger is better for me.",
+    text: "Plenty of room; I fit a lunch, a hoodie and two textbooks. Bigger is better for me.",
     date: "2026-08-29",
     journey: "use",
     journeyBasis: "stated",
@@ -656,7 +656,7 @@ const evidence: EvidenceRecord[] = [
   },
 ];
 
-/** Synthetic survey responses — seeded, kept separate from responses collected in the app. */
+/** Synthetic survey responses; seeded, kept separate from responses collected in the app. */
 export const seededSurveyResponses: SurveyResponse[] = [
   {
     id: "SYN-S01",
@@ -741,7 +741,7 @@ export const campusBackpack: ProductConfig = {
     "A fictional orange-and-navy daypack with a padded laptop sleeve, a roomy main compartment, a front organiser pocket and padded shoulder straps. Listed at $78 in this demo.",
   attributes: [
     { label: "Listed price", value: "$78 (fictional)" },
-    { label: "Laptop sleeve", value: '"Fits most laptops" — no dimensions listed' },
+    { label: "Laptop sleeve", value: '"Fits most laptops"; no dimensions listed' },
     { label: "Colours", value: "Orange / navy" },
     { label: "Empty weight", value: "Not listed" },
   ],
@@ -831,8 +831,8 @@ export const campusBackpack: ProductConfig = {
       contradictingIds: ["SYN-R02", "SYN-R03"],
       missing: [
         "Laptop sizes carried by people who never asked a question",
-        "Return reasons — no return records in this dataset",
-        "Product-page behaviour — no session data in this dataset",
+        "Return reasons; no return records in this dataset",
+        "Product-page behaviour; no session data in this dataset",
       ],
       hypothesis:
         "If interior dimensions are visible, more people will correctly judge whether their laptop fits before choosing.",
@@ -889,7 +889,7 @@ export const campusBackpack: ProductConfig = {
       supportingIds: ["SYN-R08", "SYN-D06"],
       contradictingIds: [],
       missing: [
-        "Observed in-use behaviour — the dataset has no usage observations",
+        "Observed in-use behaviour; the dataset has no usage observations",
         "Which small items people need most often",
       ],
       hypothesis:
@@ -907,7 +907,7 @@ export const campusBackpack: ProductConfig = {
       supportingIds: ["SYN-R09", "SYN-D07"],
       contradictingIds: [],
       missing: [
-        "How often zipper pulls fail — no warranty data in this dataset",
+        "How often zipper pulls fail; no warranty data in this dataset",
         "Whether people would pay for parts versus expect free repair",
       ],
       hypothesis: "Visible repair options will be preferred over replacing the whole bag.",
@@ -967,7 +967,7 @@ export const campusBackpack: ProductConfig = {
     {
       id: "RQ-speed",
       desire: "speed",
-      question: "Is speed relevant for a backpack at all — e.g., quick access? No evidence yet.",
+      question: "Is speed relevant for a backpack at all; e.g., quick access? No evidence yet.",
     },
   ],
   desireHints: {

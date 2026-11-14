@@ -1,3 +1,5 @@
+import { MetricGuide } from "@/components/metric-guide";
+import { AccessibilityProvider, AccessibilitySettings } from "@/components/accessibility";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -85,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SignalScope — Find the needs your reviews leave behind" },
+      { title: "SignalScope | Find the needs your reviews leave behind" },
       {
         name: "description",
         content:
@@ -136,34 +138,38 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DemoStoreProvider>
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-full focus:bg-navy focus:px-4 focus:py-2 focus:text-navy-foreground"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main" className="workspace-main mx-auto max-w-[1600px] px-5 pb-16 pt-8 sm:px-8">
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        <footer className="workspace-footer border-t-2 border-dashed border-stitch/60">
-          <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p>
-              {companyMode
-                ? "SignalScope · company research pilot."
-                : "SignalScope · a consumer-insights prototype. The demo backpack is fictional and not affiliated with any university or brand."}
-            </p>
-            <p>
-              {companyMode
-                ? "Company data requires approved sources and a secure deployment."
-                : "Synthetic demonstration evidence—not findings about a real product."}
-            </p>
-          </div>
-        </footer>
-        <Toaster position="bottom-center" />
-      </DemoStoreProvider>
+      <AccessibilityProvider>
+        <DemoStoreProvider>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-full focus:bg-navy focus:px-4 focus:py-2 focus:text-navy-foreground"
+          >
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main" className="workspace-main mx-auto max-w-[1600px] px-5 pb-16 pt-8 sm:px-8">
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </main>
+          <footer className="workspace-footer border-t-2 border-dashed border-stitch/60">
+            <div className="footer-controls">
+              <div>
+                <strong>SignalScope</strong>
+                <span>
+                  {companyMode
+                    ? "Company pilot · Shared research API"
+                    : "Research prototype · Browser-local data"}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <MetricGuide />
+                <AccessibilitySettings />
+              </div>
+            </div>
+          </footer>
+          <Toaster position="bottom-center" />
+        </DemoStoreProvider>
+      </AccessibilityProvider>
     </QueryClientProvider>
   );
 }

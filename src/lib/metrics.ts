@@ -36,7 +36,7 @@ export function applyOverride(record: EvidenceRecord, override?: TagOverride): E
     .filter((d) => !record.codings.some((c) => c.desire === d))
     .map((desire) => ({
       desire,
-      need: "Reviewer-added tag — need not yet described",
+      need: "Reviewer-added tag; need not yet described",
       importance: "unknown" as const,
       fulfillment: "unknown" as const,
     }));
@@ -200,7 +200,9 @@ export function summarize(product: ProductConfig, records: EvidenceRecord[]): Su
     categoriesWithEvidence: DESIRE_IDS.filter((d) => records.some((r) => hasDesire(r, d))).length,
     unansweredQuestions: passages.filter((r) => r.sourceType === "qa" && r.answered === false)
       .length,
-    unresolvedConflicts: product.conflicts.length,
+    unresolvedConflicts: product.conflicts.filter((c) =>
+      [...c.sideA.recordIds, ...c.sideB.recordIds].some((id) => records.some((r) => r.id === id)),
+    ).length,
   };
 }
 
@@ -302,5 +304,5 @@ export function rankOpportunities(opps: Opportunity[], records: EvidenceRecord[]
 
 export function pct(f: Fraction) {
   const s = share(f);
-  return s === null ? "—" : `${Math.round(s * 100)}%`;
+  return s === null ? "N/A" : `${Math.round(s * 100)}%`;
 }

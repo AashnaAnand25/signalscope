@@ -88,7 +88,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
           evidenceType: "self-reported",
         },
       ],
-      unavailable: ["Impression / session logs — not in this dataset"],
+      unavailable: ["Impression / session logs; not in this dataset"],
       leadsTo: ["not-interested", "interested"],
     },
     {
@@ -117,7 +117,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       label: "Not interested",
       group: "consideration",
       definition: "Explicitly said the product isn't relevant to them.",
-      requiredData: "An explicit statement — ignoring or leaving a page is not enough.",
+      requiredData: "An explicit statement; ignoring or leaving a page is not enough.",
       denominator: "Survey responses",
       timeWindow: "At time of survey",
       limitation: "No click does not mean not interested.",
@@ -153,7 +153,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
           evidenceType: "inferred",
         },
       ],
-      unavailable: ["Click / save events — not in this dataset"],
+      unavailable: ["Click / save events; not in this dataset"],
       leadsTo: ["considering"],
     },
     {
@@ -193,7 +193,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       requiredData: "Linked consideration and order records for the same people.",
       denominator: "People who considered",
       timeWindow: "e.g., 7 days after consideration",
-      limitation: "No purchase record does not mean rejection — they could buy later or elsewhere.",
+      limitation: "No purchase record does not mean rejection; they could buy later or elsewhere.",
       measures: [],
       unavailable: ["Linked order records"],
       leadsTo: ["considering", "competitor"],
@@ -217,7 +217,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
           evidenceType: "self-reported",
         },
       ],
-      unavailable: ["Order records — not in this dataset"],
+      unavailable: ["Order records; not in this dataset"],
       leadsTo: ["activated", "unused"],
     },
     {
@@ -237,7 +237,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       id: "activated",
       label: "Activated / in use",
       group: "use",
-      definition: "Started using the product — reported first use or ongoing use.",
+      definition: "Started using the product; reported first use or ongoing use.",
       requiredData: "A first-use milestone, usage diaries or follow-up surveys.",
       denominator: "People with the product",
       timeWindow: "Defined window after access",
@@ -297,7 +297,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
           evidenceType: "self-reported",
         },
       ],
-      unavailable: ["Support tickets — not in this dataset"],
+      unavailable: ["Support tickets; not in this dataset"],
       leadsTo: ["activated", "churned"],
       repeatable: true,
     },
@@ -305,7 +305,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       id: "feedback",
       label: "Left feedback",
       group: "feedback",
-      definition: "Submitted a review or comment — positive, mixed or negative.",
+      definition: "Submitted a review or comment; positive, mixed or negative.",
       requiredData: "Submitted feedback, classified by text.",
       denominator: "Confirmed users eligible to respond",
       timeWindow: "Defined period after use",
@@ -351,8 +351,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       requiredData: "Confirmed use plus absence of feedback within a defined period.",
       denominator: "Eligible confirmed users",
       timeWindow: "Defined feedback window",
-      limitation:
-        "No review does not mean satisfaction — they may comment elsewhere or not at all.",
+      limitation: "No review does not mean satisfaction; they may comment elsewhere or not at all.",
       measures: [
         {
           label: "Users who said they didn't post",
@@ -404,7 +403,7 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       id: "returned",
       label: "Returned",
       group: "after",
-      definition: "Returned or refunded — separate from resold or given away.",
+      definition: "Returned or refunded; separate from resold or given away.",
       requiredData: "Return / refund records; ask separately about resale or gifting.",
       denominator: "Eligible fulfilled orders",
       timeWindow: "Return window",
@@ -502,7 +501,7 @@ export const MISSING_PERSPECTIVES = [
   {
     id: "unmeasured-awareness",
     title: "People whose awareness was never measured",
-    gap: "Our sources only include people who wrote something or took the survey. Everyone else's awareness is unknown — not zero.",
+    gap: "Our sources only include people who wrote something or took the survey. Everyone else's awareness is unknown; not zero.",
     reach: "Ask the prior-awareness question to a broader, recruited sample.",
   },
   {
@@ -514,7 +513,7 @@ export const MISSING_PERSPECTIVES = [
   {
     id: "silent-owners",
     title: "Owners who never gave feedback",
-    gap: "Reviews come from a self-selected few. Silence is not satisfaction — these owners' experiences are simply missing.",
+    gap: "Reviews come from a self-selected few. Silence is not satisfaction; these owners' experiences are simply missing.",
     reach: "Invite all owners to a short follow-up, not only those who chose to review.",
   },
   {

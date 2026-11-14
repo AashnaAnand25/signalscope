@@ -81,7 +81,7 @@ export function NeedSticker({ stats, hint, index, selected, dimmed, onOpen }: Pr
             </p>
           </>
         ) : (
-          <Badge variant="muted">No mentions — unknown, not unimportant</Badge>
+          <Badge variant="muted">No mentions; unknown, not unimportant</Badge>
         )}
       </div>
     </button>

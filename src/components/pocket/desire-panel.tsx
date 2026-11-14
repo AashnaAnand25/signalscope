@@ -36,10 +36,10 @@ interface Props {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-2">
-      <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
+    <details className="space-y-3 rounded-xl border p-3">
+      <summary className="cursor-pointer text-sm font-bold tracking-wide">{title}</summary>
       {children}
-    </section>
+    </details>
   );
 }
 
@@ -168,7 +168,7 @@ export function DesirePanel({ desire, records, contextLabel, onClose }: Props) {
             </div>
             {stats.mentions === 0 && (
               <Empty>
-                No records mention {meta.label.toLowerCase()}. Missing mentions are unknown — not
+                No records mention {meta.label.toLowerCase()}. Missing mentions are unknown; not
                 evidence that it's unimportant.
               </Empty>
             )}
@@ -286,7 +286,7 @@ export function DesirePanel({ desire, records, contextLabel, onClose }: Props) {
                 ))}
                 <p className="pt-1 text-xs text-muted-foreground">
                   These are stated budgets and ranges people would consider. They are not
-                  demonstrated willingness to pay — no purchase-price data is in this dataset.
+                  demonstrated willingness to pay; no purchase-price data is in this dataset.
                 </p>
               </div>
             </Section>
@@ -361,7 +361,7 @@ export function DesirePanel({ desire, records, contextLabel, onClose }: Props) {
             )}
           </Section>
 
-          <Section title={`Counterexamples — reported met (${counter.length})`}>
+          <Section title={`Counterexamples; reported met (${counter.length})`}>
             {counter.length ? (
               <div className="space-y-3">
                 {counter.map((r, i) => (

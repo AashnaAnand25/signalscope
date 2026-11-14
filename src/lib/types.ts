@@ -54,7 +54,7 @@ export interface DesireCoding {
 }
 
 export interface StatedBudget {
-  /** Stated budget in USD — a stated number, not a demonstrated willingness to pay. */
+  /** Stated budget in USD; a stated number, not a demonstrated willingness to pay. */
   min?: number | undefined;
   max?: number | undefined;
   label: string;

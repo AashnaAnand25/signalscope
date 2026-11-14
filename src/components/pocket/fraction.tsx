@@ -37,6 +37,18 @@ export function FractionStat({
           {s === null ? "No denominator" : `${Math.round(s * 100)}%`}
         </span>
       </div>
+      <details className="metric-help">
+        <summary>Read this number</summary>
+        <p>
+          {value.numerator} out of {value.denominator} {value.unit}
+          {label ? `: ${label}` : ""}.{" "}
+          {s === null
+            ? "No eligible records, so a percentage cannot be calculated."
+            : `About ${Math.round(s * 100)} out of every 100 in this group.`}{" "}
+          This describes selected evidence, not all customers. A person may contribute several
+          passages.
+        </p>
+      </details>
       {showBar && (
         <div
           className="h-2 overflow-hidden rounded-full bg-muted"

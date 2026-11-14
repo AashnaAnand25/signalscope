@@ -24,8 +24,8 @@ export function PageIntro({ eyebrow, title, description, guide, actions }: Props
     <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
       <div className="max-w-3xl">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
-        <h1 className="mt-2 text-4xl font-semibold leading-[1.05] sm:text-5xl">{title}</h1>
-        <div className="mt-3 text-base text-muted-foreground sm:text-lg">{description}</div>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{title}</h1>
+        <div className="mt-3 text-sm text-muted-foreground">{description}</div>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {actions}
@@ -75,7 +75,7 @@ export function SyntheticNotice({ className = "" }: { className?: string }) {
     <p
       className={`inline-flex items-center gap-2 rounded-full border-2 border-dashed border-lavender-strong/40 bg-lavender/70 px-3 py-1 text-xs font-semibold text-lavender-strong ${className}`}
     >
-      Synthetic demonstration evidence—not findings about a real product.
+      Synthetic demonstration evidence; not findings about a real product.
     </p>
   );
 }
