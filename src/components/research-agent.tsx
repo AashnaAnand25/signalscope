@@ -50,6 +50,7 @@ export function ResearchAgent() {
     try {
       const response = await fetch("/api/research", {
         method: "POST",
+        signal: AbortSignal.timeout(50000),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode,
@@ -68,7 +69,13 @@ export function ResearchAgent() {
           : "AI draft. Check its sources before making a decision.",
       );
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : "Request failed.");
+      setNotice(
+        e instanceof Error && ["TimeoutError", "AbortError"].includes(e.name)
+          ? "The request took longer than 50 seconds. Nothing was saved. Try again; if it repeats, check the server network connection."
+          : e instanceof Error
+            ? e.message
+            : "Request failed.",
+      );
     } finally {
       setBusy(false);
     }
@@ -242,7 +249,11 @@ export function ResearchAgent() {
         }
         onClick={run}
       >
-        {busy ? "Researching…" : mode === "extract" ? "Suggest need tags" : "Run research"}
+        {busy
+          ? "Researching (up to 50 seconds)…"
+          : mode === "extract"
+            ? "Suggest need tags"
+            : "Run research"}
       </Button>
       {notice && (
         <p role="status" className="workspace-notice text-sm">

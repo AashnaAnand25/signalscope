@@ -164,7 +164,25 @@ export async function handleResearch(request: Request): Promise<Response> {
   } catch (error) {
     const cause =
       error instanceof Error ? (error.cause as { code?: string } | undefined) : undefined;
-    if (["ENOTFOUND", "EAI_AGAIN", "ENETUNREACH", "ECONNREFUSED"].includes(cause?.code ?? ""))
+    if (error instanceof Error && ["TimeoutError", "AbortError"].includes(error.name))
+      return json(
+        {
+          error:
+            "Google did not finish within 45 seconds. Nothing was saved. Retry once; repeated timeouts may indicate a network or provider issue.",
+        },
+        504,
+      );
+    if (
+      [
+        "ENOTFOUND",
+        "EAI_AGAIN",
+        "ENETUNREACH",
+        "ECONNREFUSED",
+        "ECONNRESET",
+        "ETIMEDOUT",
+        "UND_ERR_CONNECT_TIMEOUT",
+      ].includes(cause?.code ?? "")
+    )
       return json(
         {
           error:

@@ -43,3 +43,5 @@ References:
 
 ## Test outcome in the coding environment
 The application detected configured credentials after restart. The live request could not reach Google because hostname resolution failed (`ENOTFOUND`). This does not establish key validity. Start the app from your normal terminal or a network-enabled hosting environment to validate provider access. The credential file was not inspected during this test.
+
+Follow-up: after launch from the user's terminal, one live extraction request succeeded (HTTP 200, 10.7 seconds). Earlier network failures remain possible; retry once if a request times out. Live evidence questions and Google Search still require separate verification.

@@ -116,3 +116,6 @@ Avoid presenting a tour of every chart. The story is: identify a need, inspect e
 Graphify generated an interactive source graph and JSON using local AST extraction. It excludes semantic analysis of documents and does not prove runtime correctness. See `graphify-out/GRAPH_REPORT.md` and `graphify-out/graph.html`.
 
 Loop Coding and Graphify instructions were imported project-locally under `.agents/skills/`. Global personal-skill installation was unavailable, so these are repository instructions rather than a claimed account-wide installation. No background loop, scheduled job or delegated agent was launched.
+
+## Live extraction follow-up
+After the app was launched from the user's terminal, a follow-up extraction succeeded: HTTP 200 in 10.7 seconds, returning one suggestion for a synthetic laptop-fit test passage. The key file was not opened or inspected. This establishes successful extraction for that request; live evidence-question and web-search modes are not yet verified. An earlier request failed, so failures are intermittent rather than evidence of an invalid key. Browser requests now have a 50-second deadline; server provider timeouts return a specific 504 error after 45 seconds.
