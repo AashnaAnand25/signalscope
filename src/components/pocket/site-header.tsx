@@ -1,6 +1,20 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Check, Compass, Database, Menu, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import {
+  Check,
+  Compass,
+  Database,
+  PanelLeftClose,
+  PanelLeftOpen,
+  RotateCcw,
+  LayoutDashboard,
+  Heart,
+  Route,
+  Library,
+  Lightbulb,
+  MessageSquare,
+  Settings,
+} from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -49,7 +63,7 @@ function ProvenanceBadge() {
       <PopoverContent className="w-80 rounded-2xl border-2 bg-paper p-4 text-sm" align="end">
         <p className="font-display text-base font-semibold">Where this data comes from</p>
         <p className="mt-2 font-semibold text-lavender-strong">
-          Synthetic demonstration evidence—not findings about a real product.
+          Synthetic demonstration evidence; not findings about a real product.
         </p>
         <ul className="mt-3 space-y-1.5 tabular text-muted-foreground">
           <li>
@@ -65,8 +79,8 @@ function ProvenanceBadge() {
           {storageNotice}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          No backend is connected. Other devices do not share responses here. Coding provenance is
-          shown on each record; no live AI analysis is connected.
+          Records stay in this browser. The Data workspace offers optional server-side Gemini
+          analysis. AI suggestions require your review.
         </p>
       </PopoverContent>
     </Popover>
@@ -141,22 +155,58 @@ function DemoTrail({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
 
 export function SiteHeader() {
   const { product, products, setProductId } = useDemo();
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem("signalscope:sidebar") === "collapsed");
+    } catch {
+      /* use expanded */
+    }
+  }, []);
+  useEffect(() => {
+    document.documentElement.dataset["sidebar"] = collapsed ? "collapsed" : "expanded";
+  }, [collapsed]);
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+    try {
+      localStorage.setItem("signalscope:sidebar", !collapsed ? "collapsed" : "expanded");
+    } catch {
+      /* visit only */
+    }
+  };
+  const navIcons = [LayoutDashboard, Heart, Route, Library, Lightbulb, MessageSquare, Settings];
   const [trailOpen, setTrailOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const links = NAV.map((n) => (
+  const links = NAV.map((n, i) => (
     <Link
       key={n.to}
       to={n.to}
+      title={n.label}
+      aria-label={n.label}
       aria-current={
         (n.to === "/" ? pathname === "/" : pathname.startsWith(n.to)) ? "page" : undefined
       }
     >
-      {n.label}
+      {(() => {
+        const Icon = navIcons[i]!;
+        return <Icon size={18} aria-hidden />;
+      })()}
+      <span className="nav-label">{n.label}</span>
     </Link>
   ));
   return (
     <>
       <aside className="workspace-sidebar">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="sidebar-toggle"
+          onClick={toggleSidebar}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+        >
+          {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+        </Button>
         <Link to="/" className="flex items-center gap-3">
           <PocketPal className="h-9 w-9" />
           <span className="brand-name">SignalScope</span>

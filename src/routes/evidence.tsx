@@ -32,7 +32,7 @@ export const Route = createFileRoute("/evidence")({
       { property: "og:title", content: "Evidence library · SignalScope" },
       {
         property: "og:description",
-        content: "Every record behind every number — searchable, filterable and reviewable.",
+        content: "Evidence library; searchable, filterable and reviewable.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -117,11 +117,10 @@ function EvidencePage() {
     <div className="space-y-10">
       <PageIntro
         eyebrow="Evidence library"
-        title="Every record behind every number"
+        title="Evidence library"
         description={
           <>
-            Search, filter and review the passages. Corrections change tags only — never the
-            original text. <SyntheticNotice className="mt-2" />
+            Search sources. Review tags. Preserve originals. <SyntheticNotice className="mt-2" />
           </>
         }
         guide={{
@@ -253,36 +252,42 @@ function EvidencePage() {
             Shown side by side. Labelled unresolved until verified with new evidence.
           </p>
         </div>
-        {product.conflicts.map((c) => (
-          <article
-            key={c.id}
-            className="rounded-3xl border-2 border-lavender-strong/25 bg-paper p-5 shadow-soft"
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-xl font-semibold">{c.title}</h3>
-              <Badge variant="lavender">Unresolved</Badge>
-              <span className="text-sm text-muted-foreground">{c.issue}</span>
-            </div>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              {[c.sideA, c.sideB].map((side, i) => (
-                <div
-                  key={i}
-                  className={i ? "rounded-2xl bg-lavender/40 p-3" : "rounded-2xl bg-sage/40 p-3"}
-                >
-                  <p className="mb-2 font-semibold">{side.label}</p>
-                  <div className="space-y-3">
-                    {side.recordIds
-                      .map((id) => byId.get(id))
-                      .filter((r): r is EvidenceRecord => !!r)
-                      .map((r) => (
-                        <EvidenceCard key={r.id} record={r} compact onEditTags={setEditing} />
-                      ))}
+        {product.conflicts
+          .filter((c) =>
+            [...c.sideA.recordIds, ...c.sideB.recordIds].some((id) =>
+              filtered.some((r) => r.id === id),
+            ),
+          )
+          .map((c) => (
+            <article
+              key={c.id}
+              className="rounded-3xl border-2 border-lavender-strong/25 bg-paper p-5 shadow-soft"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-xl font-semibold">{c.title}</h3>
+                <Badge variant="lavender">Unresolved</Badge>
+                <span className="text-sm text-muted-foreground">{c.issue}</span>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {[c.sideA, c.sideB].map((side, i) => (
+                  <div
+                    key={i}
+                    className={i ? "rounded-2xl bg-lavender/40 p-3" : "rounded-2xl bg-sage/40 p-3"}
+                  >
+                    <p className="mb-2 font-semibold">{side.label}</p>
+                    <div className="space-y-3">
+                      {side.recordIds
+                        .map((id) => byId.get(id))
+                        .filter((r): r is EvidenceRecord => !!r)
+                        .map((r) => (
+                          <EvidenceCard key={r.id} record={r} compact onEditTags={setEditing} />
+                        ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </article>
-        ))}
+                ))}
+              </div>
+            </article>
+          ))}
       </section>
 
       <TagEditor record={editing} onClose={() => setEditing(null)} />

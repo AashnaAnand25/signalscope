@@ -33,7 +33,7 @@ export const Route = createFileRoute("/desires")({
       { property: "og:title", content: "Customer desires · SignalScope" },
       {
         property: "og:description",
-        content: "What people explicitly ask for — with every count traced to its evidence.",
+        content: "What people explicitly ask for; with every count traced to its evidence.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -60,13 +60,13 @@ function DesiresPage() {
     <div className="space-y-10">
       <PageIntro
         eyebrow="Customer desires"
-        title="What people say they need"
-        description="Ten categories of desire, each traced to the passages and survey answers behind it. Select a category to open the full story."
+        title="Customer needs"
+        description="10 categories. Source-linked evidence."
         guide={{
           points: [
             "Each category counts records that mention the need, out of all records in the current filter.",
             "Must-have and unmet counts use the records mentioning that need as their denominator.",
-            "Zero mentions mean we don't know — not that the need is unimportant.",
+            "Zero mentions mean we don't know; not that the need is unimportant.",
             "Shares describe this collection only. “8 / 26 records mention laptop fit” never means “31% of customers”.",
           ],
         }}
@@ -102,7 +102,7 @@ function DesiresPage() {
       {hotspot && (
         <div className="flex animate-pocket-open flex-wrap items-center gap-3 rounded-3xl border-2 border-dashed border-primary/50 bg-primary-soft/50 px-5 py-3">
           <p className="font-semibold">
-            Showing the <span className="text-rust">{hotspot.label.toLowerCase()}</span> —{" "}
+            Showing the <span className="text-rust">{hotspot.label.toLowerCase()}</span>;{" "}
             {hotspot.description.toLowerCase()}
           </p>
           <div className="flex gap-1.5">

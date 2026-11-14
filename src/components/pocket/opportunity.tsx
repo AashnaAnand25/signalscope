@@ -210,7 +210,7 @@ export function OpportunityDialog({ o, onClose }: { o: Opportunity | null; onClo
               </div>
             ) : (
               <p className="mt-2 rounded-xl border-2 border-dashed px-3 py-2 text-sm text-muted-foreground">
-                No contradicting passages in the collection — that is not proof there are none.
+                No contradicting passages in the collection; that is not proof there are none.
               </p>
             )}
           </section>

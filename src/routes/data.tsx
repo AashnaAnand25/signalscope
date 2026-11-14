@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ResearchAgent } from "@/components/research-agent";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/pocket/page-intro";
@@ -125,12 +126,14 @@ function DataWorkspace() {
           </p>
         )}
       </section>
+      <ResearchAgent />
       <section className="workspace-notice">
         <strong>Research boundary</strong>
         <p>
           The provided example is synthetic. Importing a file does not verify its claims or make
-          AI-suggested tags human-reviewed. Only add data you are allowed to use. No automatic
-          scraping or live AI analysis is connected.
+          AI-suggested tags human-reviewed. Only add data you are allowed to use. Gemini analysis is
+          optional and requires a server key. Velocity data requires an authorized export; there is
+          no direct Velocity connector.
         </p>
       </section>
     </div>

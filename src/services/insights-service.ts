@@ -31,19 +31,27 @@ export interface DesireExtractionResult {
   reason: string;
 }
 
-/**
- * Integration point for a future backend that extracts desires from supplied text.
- * No AI service is connected in this demo, so this never simulates an analysis call:
- * all tags shown are pre-coded demo tags, respondent selections or reviewer edits.
- */
+/** Server-only Google credentials are used behind this same-origin endpoint. */
 export async function extractDesires(
-  _text: string,
+  text: string,
 ): Promise<DesireExtractionResult | { available: true; codings: DesireCoding[] }> {
-  return {
-    available: false,
-    reason:
-      "No analysis service is connected. Tags in this demo are pre-coded, respondent-selected or reviewer-edited.",
-  };
+  try {
+    const response = await fetch("/api/research", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "extract", text }),
+    });
+    const data = await response.json();
+    if (!response.ok) return { available: false, reason: data.error || "Analysis failed" };
+    const { validateExtraction } = await import("@/lib/research-contract");
+    const parsed = validateExtraction(data, text);
+    return {
+      available: true,
+      codings: parsed.suggestions.map(({ quote: _quote, ...coding }) => coding),
+    };
+  } catch {
+    return { available: false, reason: "Analysis service is unavailable." };
+  }
 }
 
 const KEY = "the-missing-pocket:v1";
@@ -69,7 +77,7 @@ export const localService: InsightsService = {
       window.localStorage.setItem(KEY, JSON.stringify(state));
     } catch {
       storageAvailable = false;
-      /* storage full or unavailable — the demo keeps working in memory */
+      /* storage full or unavailable; the demo keeps working in memory */
     }
   },
   clear() {
