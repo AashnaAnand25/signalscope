@@ -216,9 +216,9 @@ export function dateRange(records: EvidenceRecord[]) {
 
 /** Survey responses whose "matters most" pick matches a desire. */
 export function surveyPicks(records: EvidenceRecord[], desire: DesireId): Fraction {
-  const survey = records.filter((r) => r.sourceType === "survey");
+  const survey = records.filter((r) => r.sourceType === "survey" && r.surveyTopDesire);
   return {
-    numerator: survey.filter((r) => hasDesire(r, desire)).length,
+    numerator: survey.filter((r) => r.surveyTopDesire === desire).length,
     denominator: survey.length,
     unit: "survey responses",
   };
@@ -234,6 +234,62 @@ export function opportunityEvidence(o: Opportunity, records: EvidenceRecord[]) {
     .filter((r): r is EvidenceRecord => !!r);
   const survey = o.surveySupportDesire ? surveyPicks(records, o.surveySupportDesire) : undefined;
   return { supporting, contradicting, survey };
+}
+
+/** Draft research opportunities derived only from reviewed, collected passages. */
+export function derivedOpportunities(records: EvidenceRecord[]): Opportunity[] {
+  const groups = new Map<
+    string,
+    {
+      desire: DesireId;
+      need: string;
+      supportingIds: Set<string>;
+      contradictingIds: Set<string>;
+    }
+  >();
+  for (const r of records) {
+    if (
+      r.origin !== "collected" ||
+      r.sourceType === "survey" ||
+      r.codingStatus !== "human-reviewed"
+    )
+      continue;
+    for (const c of r.codings) {
+      const need = c.need.trim().replace(/\s+/g, " ");
+      if (!need || need.startsWith("Reviewer-added tag")) continue;
+      const key = `${c.desire}:${need.toLowerCase()}`;
+      const group = groups.get(key) ?? {
+        desire: c.desire,
+        need,
+        supportingIds: new Set<string>(),
+        contradictingIds: new Set<string>(),
+      };
+      if (c.fulfillment === "unmet" || c.fulfillment === "partly-met")
+        group.supportingIds.add(r.id);
+      if (c.fulfillment === "met") group.contradictingIds.add(r.id);
+      groups.set(key, group);
+    }
+  }
+  return [...groups.entries()]
+    .filter(([, group]) => group.supportingIds.size)
+    .sort((a, b) => b[1].supportingIds.size - a[1].supportingIds.size)
+    .slice(0, 50)
+    .map(([key, group]) => ({
+      id: `collected:${key}`,
+      title: `Investigate: ${group.need}`,
+      improvement: `Explore a product or information change that addresses: ${group.need}.`,
+      supportingIds: [...group.supportingIds],
+      contradictingIds: [...group.contradictingIds],
+      missing: [
+        "How often this need occurs outside the collected passages",
+        "Whether a change would affect purchase decisions",
+      ],
+      hypothesis: `Addressing ${group.need} may improve the experience for people who raised it.`,
+      experiment:
+        "Compare the current product with a revised concept among relevant buyers and non-buyers; record choices, reasons, and trade-offs.",
+      desires: [group.desire],
+      defaultStatus: "investigate",
+    }));
 }
 
 export function rankOpportunities(opps: Opportunity[], records: EvidenceRecord[]) {

@@ -104,12 +104,15 @@ function EvidencePage() {
     hydrated,
   } = useDemo();
   const [editing, setEditing] = useState<EvidenceRecord | null>(null);
+  const [visibleCount, setVisibleCount] = useState(60);
   const set = (patch: Partial<EvidenceFilters>) => setEvidenceFilters({ ...f, ...patch });
   const filtered = records.filter((r) => matches(r, f));
   const active = (Object.keys(EMPTY_FILTERS) as (keyof EvidenceFilters)[]).filter(
     (k) => f[k] !== EMPTY_FILTERS[k],
   ).length;
   const byId = new Map(records.map((r) => [r.id, r]));
+
+  useEffect(() => setVisibleCount(60), [f, product.id]);
 
   useEffect(() => markTrail("evidence"), [markTrail]);
 
@@ -210,8 +213,8 @@ function EvidencePage() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
           <p className="tabular" aria-live="polite">
-            Showing <span className="font-semibold">{filtered.length}</span> of {records.length}{" "}
-            records
+            Showing <span className="font-semibold">{Math.min(visibleCount, filtered.length)}</span>{" "}
+            of {filtered.length} matches ({records.length} records)
             {!hydrated && (
               <span className="ml-2 text-muted-foreground">· loading saved responses…</span>
             )}
@@ -226,7 +229,7 @@ function EvidencePage() {
 
       {filtered.length ? (
         <div className="columns-1 gap-4 md:columns-2 xl:columns-3 [&>*]:mb-4 [&>*]:break-inside-avoid">
-          {filtered.map((r, i) => (
+          {filtered.slice(0, visibleCount).map((r, i) => (
             <EvidenceCard key={r.id} record={r} index={i} onEditTags={setEditing} highlight={f.q} />
           ))}
         </div>
@@ -243,6 +246,12 @@ function EvidencePage() {
             Clear filters
           </Button>
         </div>
+      )}
+
+      {filtered.length > visibleCount && (
+        <Button variant="outline" onClick={() => setVisibleCount((n) => n + 60)}>
+          Show 60 more records
+        </Button>
       )}
 
       <section className="space-y-4">

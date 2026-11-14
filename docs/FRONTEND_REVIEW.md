@@ -15,6 +15,7 @@ The app now prioritizes counts and charts, explains their meaning on demand, sup
 - Application source and all seven rendered route responses contain zero em dashes. Imported source passages are not rewritten on ingestion.
 - Conflict summaries now respect the selected evidence scope.
 - Research assistant: passage tagging, questions over selected evidence, and Google Search-grounded research.
+- A merged evidence-to-decision storyboard preserves the new guided demo and rule-based opportunity candidates.
 - AI extraction must return exact supporting quote substrings. A user selects suggestions before a passage enters the dataset. Tags remain AI-suggested until separately reviewed.
 - Synthetic records are excluded from AI evidence questions by default.
 - Server credentials stay outside browser requests and source control. The local credential file was created, then not opened or inspected.
@@ -41,7 +42,7 @@ Initial synthetic seed: 26 passages and 6 survey responses. This sample is illus
 | Check | Outcome | Evidence / limit |
 | --- | --- | --- |
 | TypeScript | Passed | `bun run typecheck` |
-| Automated suite | Passed | 16 tests across five files |
+| Automated suite | Passed | 21 tests across five files |
 | Lint | Passed with warnings | Zero errors; eight existing Fast Refresh warnings |
 | Production build | Passed | TanStack Start + Nitro Node output |
 | All seven routes | Passed | Production HTTP 200, route-specific title and main content |
@@ -86,7 +87,7 @@ These are product judgments, not claims of first-in-the-world novelty.
 ## What is ordinary or weak
 - Generic KPI cards, a donut, dark mode and an AI text box are useful, but not the core innovation.
 - Synthetic examples do not demonstrate a real consumer insight. This is the largest remaining demo weakness.
-- Existing opportunity/conflict cards are curated product configuration. The app does not automatically discover all new opportunities from every imported corpus.
+- Product-specific opportunity/conflict cards remain curated. The merged changes also derive rule-based opportunity candidates from new evidence, but do not establish validated commercial demand.
 - The monthly chart shows corpus collection dates, not a business outcome. Keep it secondary in the pitch.
 - A copied survey link or QR code does not provide shared storage or cross-device collection.
 - No validated extraction-quality benchmark or representative consumer sample exists yet.

@@ -251,8 +251,12 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
           evidenceType: "self-reported",
         },
         {
-          label: "Respondents describing use",
-          count: n((r) => !!r.usageNotes),
+          label: "Respondents reporting use",
+          count: n(
+            (r) =>
+              r.usedProduct === "yes" &&
+              (r.experience === "purchased" || r.experience === "accessed-other"),
+          ),
           unit: "survey responses",
           source: surveySrc,
           evidenceType: "self-reported",

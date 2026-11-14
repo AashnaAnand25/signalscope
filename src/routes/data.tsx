@@ -130,10 +130,9 @@ function DataWorkspace() {
       <section className="workspace-notice">
         <strong>Research boundary</strong>
         <p>
-          The provided example is synthetic. Importing a file does not verify its claims or make
-          AI-suggested tags human-reviewed. Only add data you are allowed to use. Gemini analysis is
-          optional and requires a server key. Velocity data requires an authorized export; there is
-          no direct Velocity connector.
+          Real passages need a source URL or reference. Verify AI-suggested tags against the
+          original. Gemini requires a server key. Velocity requires an authorized export; no direct
+          connector is configured.
         </p>
       </section>
     </div>

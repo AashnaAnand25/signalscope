@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { OpportunityDialog } from "@/components/pocket/opportunity";
 import { BackpackExplorer } from "@/components/pocket/backpack-explorer";
 import { useDemo } from "@/lib/demo-store";
-import { summarize, rankOpportunities, allDesireStats } from "@/lib/metrics";
+import { summarize, rankOpportunities, allDesireStats, derivedOpportunities } from "@/lib/metrics";
 import { SOURCE_TYPES, type SourceType, type Opportunity } from "@/lib/types";
 import { SOURCE_LABEL, DESIRE_META } from "@/lib/labels";
 import {
@@ -40,7 +40,10 @@ function Overview() {
   const s = summarize(product, records);
   const unmet = records.filter((r) => r.codings.some((c) => c.fulfillment === "unmet")).length;
   const gaps = s.unansweredQuestions + s.unresolvedConflicts;
-  const leading = rankOpportunities(product.opportunities, records)
+  const leading = rankOpportunities(
+    [...product.opportunities, ...derivedOpportunities(records)],
+    records,
+  )
     .filter((x) => x.ev.supporting.length || x.ev.contradicting.length)
     .slice(0, 3);
   const stats = allDesireStats(records);

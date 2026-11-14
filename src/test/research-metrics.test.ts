@@ -1,8 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { campusBackpack } from "@/data/campus-backpack";
-import { desireStats, priceDistribution } from "@/lib/metrics";
+import {
+  applyOverride,
+  derivedOpportunities,
+  desireStats,
+  priceDistribution,
+  surveyPicks,
+} from "@/lib/metrics";
 import { parseEvidenceImport, persistedSchema } from "@/lib/validation";
-import { surveySchema } from "@/lib/survey";
+import { surveySchema, surveyToEvidence } from "@/lib/survey";
+import { buildJourney } from "@/lib/journey";
+import { seededSurveyResponses } from "@/data/campus-backpack";
 function record() {
   return structuredClone(campusBackpack.evidence[0]!);
 }
@@ -57,5 +65,60 @@ describe("Research measurement boundaries", () => {
         responses: [{ topDesire: "invented" }],
       }),
     ).toThrow();
+  });
+  it("tag edits do not rewrite what a respondent selected", () => {
+    const response = seededSurveyResponses[0]!;
+    const evidence = surveyToEvidence(response, campusBackpack);
+    const corrected = applyOverride(evidence, {
+      desires: [response.topDesire === "price" ? "quality" : "price"],
+      reviewedAt: new Date().toISOString(),
+    });
+    expect(surveyPicks([corrected], response.topDesire).numerator).toBe(1);
+  });
+  it("counts reported use even without optional usage notes", () => {
+    const response = {
+      ...seededSurveyResponses[0]!,
+      experience: "purchased" as const,
+      usedProduct: "yes" as const,
+      usageNotes: undefined,
+    };
+    const node = buildJourney([], [response]).nodes.find((n) => n.id === "activated")!;
+    expect(node.measures.find((m) => m.label === "Respondents reporting use")?.count).toBe(1);
+  });
+  it("creates a traceable draft from reviewed collected unmet evidence", () => {
+    const r = record();
+    r.id = "COLLECTED-1";
+    r.origin = "collected";
+    r.sourceReference = "Interview 1, question 4";
+    r.codingStatus = "human-reviewed";
+    r.codings = [
+      {
+        desire: "quality",
+        need: "Straps that support a heavy load",
+        importance: "must-have",
+        fulfillment: "unmet",
+      },
+    ];
+    const imported = parseEvidenceImport([r], campusBackpack.id);
+    const draft = derivedOpportunities(imported)[0]!;
+    expect(draft.supportingIds).toEqual([r.id]);
+    expect(draft.title).toContain("Straps that support a heavy load");
+  });
+  it("rejects unsourced collected passages and survey records in evidence imports", () => {
+    const r = record();
+    r.id = "COLLECTED-2";
+    r.origin = "collected";
+    r.codingStatus = "human-reviewed";
+    expect(() => parseEvidenceImport([r], campusBackpack.id)).toThrow("source URL or reference");
+    r.sourceReference = "Interview 2";
+    r.sourceType = "survey";
+    r.surveyResponseId = "invented";
+    expect(() => parseEvidenceImport([r], campusBackpack.id)).toThrow("survey form");
+  });
+  it("rejects impossible calendar dates in imported records", () => {
+    const r = record();
+    r.id = "BAD-DATE";
+    r.date = "2026-02-30";
+    expect(() => parseEvidenceImport([r], campusBackpack.id)).toThrow();
   });
 });

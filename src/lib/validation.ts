@@ -23,9 +23,14 @@ export const evidenceSchema = z.object({
   sourceType: z.enum(SOURCE_TYPES),
   text: z.string().trim().min(1).max(12000),
   sourceUrl: z.string().url().startsWith("https://").optional(),
+  sourceReference: z.string().trim().min(1).max(500).optional(),
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .refine((date) => {
+      const parsed = new Date(`${date}T00:00:00Z`);
+      return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+    }, "Invalid calendar date")
     .optional(),
   journey: z.enum(JOURNEY_CONTEXTS).optional(),
   journeyBasis: z.enum(["stated", "inferred"]).optional(),
@@ -49,6 +54,7 @@ export const evidenceSchema = z.object({
   answered: z.boolean().optional(),
   tone: z.enum(["positive", "mixed", "negative"]).optional(),
   surveyResponseId: z.string().optional(),
+  surveyTopDesire: z.enum(DESIRE_IDS).optional(),
 });
 export function parseEvidenceImport(
   input: unknown,
@@ -58,8 +64,20 @@ export function parseEvidenceImport(
   const records = z.array(evidenceSchema).min(1).max(5000).parse(input);
   const seen = new Set(existingIds);
   for (const r of records) {
-    if (r.sourceType === "survey" && !r.surveyResponseId)
-      throw new Error(`Survey record ${r.id} needs a surveyResponseId.`);
+    if (r.sourceType === "survey")
+      throw new Error(
+        `Import survey answers through the survey form, not evidence JSON (${r.id}).`,
+      );
+    if (r.surveyResponseId || r.surveyTopDesire)
+      throw new Error(`Non-survey record ${r.id} cannot link to a survey response.`);
+    if (r.origin === "collected" && !r.sourceUrl && !r.sourceReference)
+      throw new Error(`Collected record ${r.id} needs a source URL or reference.`);
+    if (
+      (r.origin === "collected" &&
+        ["pre-coded-demo", "respondent-selected"].includes(r.codingStatus)) ||
+      (r.origin === "synthetic-seed" && r.codingStatus !== "pre-coded-demo")
+    )
+      throw new Error(`Record ${r.id} has a coding status inconsistent with its origin.`);
     if (r.productId !== productId)
       throw new Error(`Product mismatch on ${r.id}. Expected ${productId}.`);
     if (seen.has(r.id)) throw new Error(`Duplicate record ID: ${r.id}`);

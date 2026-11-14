@@ -65,8 +65,14 @@ export const localService: InsightsService = {
       : "Browser storage unavailable: changes last only for this visit.";
   },
   load() {
+    let raw: string | null;
     try {
-      const raw = window.localStorage.getItem(KEY);
+      raw = window.localStorage.getItem(KEY);
+    } catch {
+      storageAvailable = false;
+      return null;
+    }
+    try {
       return raw ? (persistedSchema.parse(JSON.parse(raw)) as PersistedState) : null;
     } catch {
       return null;
@@ -75,9 +81,10 @@ export const localService: InsightsService = {
   save(state) {
     try {
       window.localStorage.setItem(KEY, JSON.stringify(state));
+      storageAvailable = true;
     } catch {
       storageAvailable = false;
-      /* storage full or unavailable; the demo keeps working in memory */
+      throw new Error("Browser storage is unavailable or full. Your changes were not saved.");
     }
   },
   clear() {

@@ -79,6 +79,7 @@ const StoreContext = createContext<Ctx | null>(null);
 
 export function DemoStoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
+  const [storageError, setStorageError] = useState("");
   const [productId, setProductId] = useState(PRODUCTS[0]!.id);
   const [externalRecords, setExternalRecords] = useState<EvidenceRecord[]>([]);
   const [collected, setCollected] = useState<SurveyResponse[]>([]);
@@ -116,7 +117,12 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       bookmarks,
       trail,
     };
-    insightsService.save(state);
+    try {
+      insightsService.save(state);
+      setStorageError("");
+    } catch (error) {
+      setStorageError(error instanceof Error ? error.message : "Changes were not saved.");
+    }
   }, [productId, collected, externalRecords, tagOverrides, oppStatus, bookmarks, trail, hydrated]);
 
   const product = getProduct(productId);
@@ -128,6 +134,20 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     () => buildRecords(product, responses, tagOverrides, externalRecords),
     [product, responses, tagOverrides, externalRecords],
   );
+
+  function persist(patch: Partial<PersistedState>) {
+    insightsService.save({
+      productId,
+      responses: collected,
+      externalRecords,
+      tagOverrides,
+      opportunityStatus: oppStatus,
+      bookmarks,
+      trail,
+      ...patch,
+    });
+    setStorageError("");
+  }
 
   const markTrail = useCallback((step: TrailStep) => {
     setTrail((t) => (t[step] ? t : { ...t, [step]: true }));
@@ -144,7 +164,14 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     addResponse: (r) => {
       const validated = validateResponse(r);
       if (validated.productId !== product.id) throw new Error("Response product mismatch.");
-      setCollected((c) => (c.some((x) => x.id === r.id) ? c : [...c, validated]));
+      if (
+        collected.some((x) => x.id === r.id) ||
+        SEEDED_SURVEY_RESPONSES.some((x) => x.id === r.id)
+      )
+        throw new Error("Duplicate response ID.");
+      const next = [...collected, validated];
+      persist({ responses: next });
+      setCollected(next);
     },
     importRecords: (input) => {
       const imported = parseEvidenceImport(
@@ -152,7 +179,9 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
         product.id,
         records.map((r) => r.id),
       );
-      setExternalRecords((r) => [...r, ...imported]);
+      const next = [...externalRecords, ...imported];
+      persist({ externalRecords: next });
+      setExternalRecords(next);
       return imported.length;
     },
     tagOverrides,
@@ -188,7 +217,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       setEvidenceFilters(EMPTY_FILTERS);
       setDesireSource("all");
     },
-    storageNotice: insightsService.storageNotice,
+    storageNotice: storageError || insightsService.storageNotice,
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

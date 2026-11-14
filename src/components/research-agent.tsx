@@ -19,6 +19,7 @@ export function ResearchAgent() {
   const [mode, setMode] = useState<"extract" | "ask" | "search">("extract");
   const [text, setText] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
+  const [sourceReference, setSourceReference] = useState("");
   const [sourceType, setSourceType] = useState<SourceType>("discussion");
   const [includeDemo, setIncludeDemo] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -85,6 +86,7 @@ export function ResearchAgent() {
           sourceType,
           text,
           ...(sourceUrl.trim() ? { sourceUrl: sourceUrl.trim() } : {}),
+          ...(sourceReference.trim() ? { sourceReference: sourceReference.trim() } : {}),
           codings,
           codingStatus: "ai-suggested",
           classification: "self-reported",
@@ -193,7 +195,7 @@ export function ResearchAgent() {
       {mode === "extract" && (
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
-            Source URL (recommended)
+            Source URL (or reference below)
             <input
               type="url"
               placeholder="https://…"
@@ -217,6 +219,18 @@ export function ResearchAgent() {
             </select>
           </label>
         </div>
+      )}
+      {mode === "extract" && (
+        <label className="block text-sm">
+          Source reference, if no URL
+          <input
+            value={sourceReference}
+            onChange={(e) => setSourceReference(e.target.value)}
+            maxLength={500}
+            placeholder="Interview date, participant ID, or export filename and section"
+            className="mt-1 block w-full rounded-lg border bg-paper p-2"
+          />
+        </label>
       )}
       <p className="text-xs text-muted-foreground">
         Running sends the supplied text to Google. Use permitted, non-sensitive research only.
@@ -260,7 +274,10 @@ export function ResearchAgent() {
               </span>
             </label>
           ))}
-          <Button disabled={!selected.length} onClick={save}>
+          <Button
+            disabled={!selected.length || (!sourceUrl.trim() && !sourceReference.trim())}
+            onClick={save}
+          >
             Add passage with {selected.length} selected tags
           </Button>
         </div>

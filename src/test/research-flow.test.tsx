@@ -49,6 +49,9 @@ it("requires selection before importing original text and AI suggestions into me
   );
   expect(screen.getByTestId("collected-count")).toHaveTextContent("0");
   expect(screen.getByRole("button", { name: "Add passage with 0 selected tags" })).toBeDisabled();
+  fireEvent.change(screen.getByLabelText("Source URL (or reference below)"), {
+    target: { value: "https://example.com/research/test-passage" },
+  });
   fireEvent.click(screen.getByRole("checkbox"));
   fireEvent.click(screen.getByRole("button", { name: "Add passage with 1 selected tags" }));
   await waitFor(() => expect(screen.getByTestId("collected-count")).toHaveTextContent("1"));
