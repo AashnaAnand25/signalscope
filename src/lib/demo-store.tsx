@@ -1,0 +1,154 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { PRODUCTS, SEEDED_SURVEY_RESPONSES, getProduct } from "@/data/products";
+import { insightsService, type PersistedState } from "@/services/insights-service";
+import { buildRecords, type TagOverride } from "./metrics";
+import type { DesireId, EvidenceRecord, OpportunityStatus, ProductConfig, SurveyResponse } from "./types";
+
+export const TRAIL_STEPS = [
+  { id: "explore", label: "Explore the product", to: "/" },
+  { id: "desire", label: "Choose a customer need", to: "/desires" },
+  { id: "evidence", label: "Inspect supporting & conflicting evidence", to: "/evidence" },
+  { id: "missing", label: "Reveal a missing perspective", to: "/journey" },
+  { id: "survey", label: "Submit a survey response", to: "/feedback" },
+  { id: "opportunity", label: "Open an improvement opportunity", to: "/opportunities" },
+] as const;
+export type TrailStep = (typeof TRAIL_STEPS)[number]["id"];
+
+export interface EvidenceFilters {
+  q: string;
+  source: string;
+  desire: string;
+  journey: string;
+  classification: string;
+  reviewed: string;
+}
+export const EMPTY_FILTERS: EvidenceFilters = { q: "", source: "all", desire: "all", journey: "all", classification: "all", reviewed: "all" };
+
+interface Ctx {
+  hydrated: boolean;
+  product: ProductConfig;
+  products: ProductConfig[];
+  setProductId: (id: string) => void;
+  /** All survey responses for the product: seeded + collected. */
+  responses: SurveyResponse[];
+  collectedResponses: SurveyResponse[];
+  records: EvidenceRecord[];
+  addResponse: (r: SurveyResponse) => void;
+  tagOverrides: Record<string, TagOverride>;
+  setTags: (recordId: string, desires: DesireId[]) => void;
+  resetTags: (recordId: string) => void;
+  opportunityStatus: (id: string) => OpportunityStatus;
+  setOpportunityStatus: (id: string, s: OpportunityStatus) => void;
+  bookmarks: string[];
+  toggleBookmark: (id: string) => void;
+  trail: Record<string, boolean>;
+  markTrail: (step: TrailStep) => void;
+  evidenceFilters: EvidenceFilters;
+  setEvidenceFilters: (f: EvidenceFilters) => void;
+  desireSource: string;
+  setDesireSource: (s: string) => void;
+  resetDemo: () => void;
+  storageNotice: string;
+}
+
+const StoreContext = createContext<Ctx | null>(null);
+
+export function DemoStoreProvider({ children }: { children: ReactNode }) {
+  const [hydrated, setHydrated] = useState(false);
+  const [productId, setProductId] = useState(PRODUCTS[0].id);
+  const [collected, setCollected] = useState<SurveyResponse[]>([]);
+  const [tagOverrides, setTagOverrides] = useState<Record<string, TagOverride>>({});
+  const [oppStatus, setOppStatus] = useState<Record<string, OpportunityStatus>>({});
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [trail, setTrail] = useState<Record<string, boolean>>({});
+  const [evidenceFilters, setEvidenceFilters] = useState<EvidenceFilters>(EMPTY_FILTERS);
+  const [desireSource, setDesireSource] = useState("all");
+  const loaded = useRef(false);
+
+  useEffect(() => {
+    const s = insightsService.load();
+    if (s) {
+      setProductId(getProduct(s.productId).id);
+      setCollected(s.responses ?? []);
+      setTagOverrides(s.tagOverrides ?? {});
+      setOppStatus(s.opportunityStatus ?? {});
+      setBookmarks(s.bookmarks ?? []);
+      setTrail(s.trail ?? {});
+    }
+    loaded.current = true;
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loaded.current) return;
+    const state: PersistedState = {
+      productId,
+      responses: collected,
+      tagOverrides,
+      opportunityStatus: oppStatus,
+      bookmarks,
+      trail,
+    };
+    insightsService.save(state);
+  }, [productId, collected, tagOverrides, oppStatus, bookmarks, trail]);
+
+  const product = getProduct(productId);
+  const responses = useMemo(
+    () => [...SEEDED_SURVEY_RESPONSES, ...collected].filter((r) => r.productId === product.id),
+    [collected, product.id],
+  );
+  const records = useMemo(() => buildRecords(product, responses, tagOverrides), [product, responses, tagOverrides]);
+
+  const markTrail = useCallback((step: TrailStep) => {
+    setTrail((t) => (t[step] ? t : { ...t, [step]: true }));
+  }, []);
+
+  const value: Ctx = {
+    hydrated,
+    product,
+    products: PRODUCTS,
+    setProductId,
+    responses,
+    collectedResponses: collected.filter((r) => r.productId === product.id),
+    records,
+    addResponse: (r) => setCollected((c) => [...c, r]),
+    tagOverrides,
+    setTags: (id, desires) =>
+      setTagOverrides((o) => ({ ...o, [id]: { desires, reviewedAt: new Date().toISOString() } })),
+    resetTags: (id) =>
+      setTagOverrides((o) => {
+        const next = { ...o };
+        delete next[id];
+        return next;
+      }),
+    opportunityStatus: (id) =>
+      oppStatus[id] ?? product.opportunities.find((o) => o.id === id)?.defaultStatus ?? "investigate",
+    setOpportunityStatus: (id, s) => setOppStatus((m) => ({ ...m, [id]: s })),
+    bookmarks,
+    toggleBookmark: (id) => setBookmarks((b) => (b.includes(id) ? b.filter((x) => x !== id) : [...b, id])),
+    trail,
+    markTrail,
+    evidenceFilters,
+    setEvidenceFilters,
+    desireSource,
+    setDesireSource,
+    resetDemo: () => {
+      setCollected([]);
+      setTagOverrides({});
+      setOppStatus({});
+      setBookmarks([]);
+      setTrail({});
+      setEvidenceFilters(EMPTY_FILTERS);
+      setDesireSource("all");
+    },
+    storageNotice: insightsService.storageNotice,
+  };
+
+  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+}
+
+export function useDemo() {
+  const ctx = useContext(StoreContext);
+  if (!ctx) throw new Error("useDemo must be used inside DemoStoreProvider");
+  return ctx;
+}

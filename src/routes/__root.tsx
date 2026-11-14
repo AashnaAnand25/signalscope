@@ -12,12 +12,17 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
+import { PocketPal } from "@/components/pocket/pocket-pal";
+import { SiteHeader } from "@/components/pocket/site-header";
+import { DemoStoreProvider } from "@/lib/demo-store";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <PocketPal className="mx-auto h-24 w-24" mood="curious" />
+        <h1 className="mt-4 text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
@@ -81,16 +86,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "The Missing Pocket — Find the needs your reviews leave behind" },
+      {
+        name: "description",
+        content:
+          "A consumer-insights studio that turns reviews, questions and surveys into traceable needs, evidence gaps and product experiments.",
+      },
+      { property: "og:title", content: "The Missing Pocket" },
+      { property: "og:description", content: "Find the needs your reviews leave behind." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -123,8 +136,26 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <DemoStoreProvider>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-full focus:bg-navy focus:px-4 focus:py-2 focus:text-navy-foreground"
+        >
+          Skip to content
+        </a>
+        <SiteHeader />
+        <main id="main" className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 sm:pt-10">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </main>
+        <footer className="border-t-2 border-dashed border-stitch/60">
+          <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p>The Missing Pocket · a consumer-insights prototype. The demo backpack is fictional and not affiliated with any university or brand.</p>
+            <p>Synthetic demonstration evidence—not findings about a real product.</p>
+          </div>
+        </footer>
+        <Toaster position="bottom-center" />
+      </DemoStoreProvider>
     </QueryClientProvider>
   );
 }
