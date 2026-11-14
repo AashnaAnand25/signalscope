@@ -1,5 +1,7 @@
 # Company research pilot
 
+For the Kearney-specific public positioning and the first client-product case, see [Kearney case brief](KEARNEY_CASE.md).
+
 The existing backpack routes are a separate synthetic demonstration. `/company` and `/company-survey` use a new Bun + SQLite service. This is a functional **single-team pilot**, not a multi-tenant enterprise deployment.
 
 ## Run locally

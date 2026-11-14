@@ -4,7 +4,7 @@ Customer evidence. Clearer decisions.
 
 A corporate consumer-intelligence workspace for the Kearney × PERLab Consumer Insights challenge. Reviews, product questions, discussions, and survey responses connect to customer desires, evidence gaps, and product experiments. The campus backpack is a fictional demonstration product.
 
-The separate [company pilot](docs/COMPANY_SETUP.md) adds shared SQLite data, configurable product variants, cited evidence review, decision records, outcome entry, and a public survey endpoint. It needs a company dataset and deployment decisions before use with real customer information.
+The separate [Kearney PERLab company pilot](docs/COMPANY_SETUP.md) adds shared SQLite data, configurable client product variants, cited evidence review, decision records, outcome entry, and a public survey endpoint. Kearney's public pages provide an offering brief only; real client evidence and deployment decisions are still needed.
 
 ## Local setup
 
@@ -65,4 +65,4 @@ Open [interactive code graph](graphify-out/graph.html) or [graph report](graphif
 
 ## Teammate work
 
-See [backend/data handoff](docs/TEAMMATE_BACKEND_PROMPT.md) for the separate shared-persistence and extraction task. A server-side Gemini integration is included. See [AI and Google Cloud setup](docs/AI_SETUP.md). Live inference requires your server key; shared persistence is still a separate task.
+See [backend/data handoff](docs/TEAMMATE_BACKEND_PROMPT.md) for the original implementation brief. A server-side Gemini integration is included for the demo routes; see [AI and Google Cloud setup](docs/AI_SETUP.md). The company pilot uses its independent Bun/SQLite API and human review; connecting AI extraction to private company records requires an approved gateway and access design.

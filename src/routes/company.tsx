@@ -4,9 +4,30 @@ import { PageIntro } from "@/components/pocket/page-intro";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/company")({
-  head: () => ({ meta: [{ title: "Company workspace · SignalScope" }] }),
+  head: () => ({ meta: [{ title: "Kearney PERLab pilot · SignalScope" }] }),
   component: CompanyWorkspace,
 });
+
+const kearneyBrief = [
+  {
+    title: "Design for growth",
+    description:
+      "PERLab describes work on product launches, portfolio clarity, and bringing customer insight into design decisions.",
+    source: "https://www.kearney.com/web/product-excellence-and-renewal-lab/what-we-do",
+  },
+  {
+    title: "Design for margin",
+    description:
+      "PERLab also describes product and portfolio redesign with cost, sourcing, quality, and sustainability trade-offs.",
+    source: "https://www.kearney.com/web/product-excellence-and-renewal-lab/what-we-do",
+  },
+  {
+    title: "Client data comes next",
+    description:
+      "Kearney invites teams to bring their own data and product into PERLab's collaborative process. A public service page is not a customer review dataset.",
+    source: "https://www.kearney.com/web/product-excellence-and-renewal-lab/about-us",
+  },
+] as const;
 
 type Product = {
   id: string;
@@ -168,10 +189,43 @@ function CompanyWorkspace() {
   return (
     <div className="space-y-7">
       <PageIntro
-        eyebrow="Shared research"
-        title="Company workspace"
-        description="Manage real products, cited evidence, reviewed needs, decisions and observed outcomes. This workspace is separate from the fictional demo."
+        eyebrow="Kearney PERLab case · Shared research"
+        title="From client product evidence to a testable decision"
+        description="Use this workspace for a PERLab client product: connect the catalog, review original customer passages, compare design and margin options, and measure outcomes. The fictional backpack demo remains separate."
       />
+      <section aria-labelledby="kearney-brief" className="space-y-4 rounded-xl border bg-white p-5">
+        <div>
+          <h2 id="kearney-brief" className="text-xl font-semibold">
+            Public Kearney brief
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Independent hackathon prototype, not an official Kearney system. These are descriptions
+            of Kearney's offering, not customer testimony, verified impact, or evidence about a
+            client's product.
+          </p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {kearneyBrief.map((item) => (
+            <article key={item.title} className="rounded-xl border bg-muted/40 p-4 text-sm">
+              <h3 className="font-semibold">{item.title}</h3>
+              <p className="mt-2">{item.description}</p>
+              <a
+                className="mt-3 inline-block underline"
+                href={item.source}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Kearney source
+              </a>
+            </article>
+          ))}
+        </div>
+        <p className="rounded-lg bg-butter/50 p-3 text-sm">
+          First case: choose one client product and revision. Bring permitted customer passages, a
+          product/BOM or service cost breakdown, and comparable conversion or outcome data. A
+          product improvement can raise demand and still hurt margin or another customer segment.
+        </p>
+      </section>
       <section className="rounded-xl border bg-white p-5 space-y-3">
         <h2 className="text-xl font-semibold">Connect to the research API</h2>
         <p className="text-sm text-muted-foreground">
