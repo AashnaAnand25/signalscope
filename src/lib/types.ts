@@ -1,4 +1,4 @@
-/** Core domain types for The Missing Pocket. Product-agnostic by design. */
+/** Core domain types for SignalScope. Product-agnostic by design. */
 
 export const DESIRE_IDS = [
   "features",
@@ -21,7 +21,8 @@ export type Importance = "must-have" | "preference" | "unknown";
 export type Fulfillment = "met" | "partly-met" | "unmet" | "conflicting" | "unknown";
 export type EvidenceClass = "observed" | "self-reported" | "inferred" | "unknown";
 /** How the desire tags on a record were produced. */
-export type CodingStatus = "pre-coded-demo" | "respondent-selected" | "ai-suggested" | "human-reviewed";
+export type CodingStatus =
+  "pre-coded-demo" | "respondent-selected" | "ai-suggested" | "human-reviewed";
 export type RecordOrigin = "synthetic-seed" | "collected";
 
 export const JOURNEY_CONTEXTS = [
@@ -40,22 +41,22 @@ export interface DesireCoding {
   /** The capability or outcome requested, in neutral words. */
   need: string;
   /** Usage context, only where stated. */
-  context?: string;
+  context?: string | undefined;
   /** Explicit budget, threshold or specification, only where stated. */
-  target?: string;
+  target?: string | undefined;
   importance: Importance;
   fulfillment: Fulfillment;
   /** What the person explicitly accepts sacrificing. */
-  tradeoff?: string;
-  dealbreaker?: boolean;
+  tradeoff?: string | undefined;
+  dealbreaker?: boolean | undefined;
   /** Other desires this requirement is explicitly linked to in the same passage. */
-  linkedWith?: DesireId[];
+  linkedWith?: DesireId[] | undefined;
 }
 
 export interface StatedBudget {
   /** Stated budget in USD — a stated number, not a demonstrated willingness to pay. */
-  min?: number;
-  max?: number;
+  min?: number | undefined;
+  max?: number | undefined;
   label: string;
 }
 
@@ -64,25 +65,25 @@ export interface EvidenceRecord {
   productId: string;
   sourceType: SourceType;
   text: string;
-  sourceUrl?: string;
+  sourceUrl?: string | undefined;
   /** ISO date, or undefined → "Date unavailable". */
-  date?: string;
-  journey?: JourneyContext;
+  date?: string | undefined;
+  journey?: JourneyContext | undefined;
   /** How the journey context was established. */
-  journeyBasis?: "stated" | "inferred";
+  journeyBasis?: "stated" | "inferred" | undefined;
   codings: DesireCoding[];
-  barrier?: string;
-  workaround?: string;
+  barrier?: string | undefined;
+  workaround?: string | undefined;
   classification: EvidenceClass;
   codingStatus: CodingStatus;
   origin: RecordOrigin;
-  budget?: StatedBudget;
+  budget?: StatedBudget | undefined;
   /** For Q&A: whether the question has an answer in the collection. */
-  answered?: boolean;
+  answered?: boolean | undefined;
   /** Overall tone of feedback passages (reviews / discussion), where coded. */
-  tone?: "positive" | "mixed" | "negative";
+  tone?: "positive" | "mixed" | "negative" | undefined;
   /** Links to the survey response this record was created from. */
-  surveyResponseId?: string;
+  surveyResponseId?: string | undefined;
 }
 
 export interface ConflictPair {
@@ -108,7 +109,7 @@ export interface Opportunity {
   desires: DesireId[];
   defaultStatus: OpportunityStatus;
   /** Optional: desire whose survey "matters most" picks count as additional support. */
-  surveySupportDesire?: DesireId;
+  surveySupportDesire?: DesireId | undefined;
 }
 
 export type HotspotId = "laptop" | "straps" | "main" | "fabric" | "price";
@@ -154,11 +155,7 @@ export interface ProductConfig {
 
 export type SurveyAwareness = "yes" | "no" | "not-sure";
 export type SurveyExperience =
-  | "never-encountered"
-  | "not-interested"
-  | "considered"
-  | "purchased"
-  | "accessed-other";
+  "never-encountered" | "not-interested" | "considered" | "purchased" | "accessed-other";
 export type SurveyPosted = "posted-publicly" | "told-someone" | "no";
 
 export interface SurveyResponse {
@@ -167,11 +164,12 @@ export interface SurveyResponse {
   submittedAt: string;
   origin: RecordOrigin;
   awareness: SurveyAwareness;
-  discovery?: string;
+  discovery?: string | undefined;
   topDesire: DesireId;
   priceRange: string;
-  needToKnow?: string;
+  needToKnow?: string | undefined;
   experience: SurveyExperience;
-  usageNotes?: string;
-  posted?: SurveyPosted;
+  usedProduct?: "yes" | "no" | undefined;
+  usageNotes?: string | undefined;
+  posted?: SurveyPosted | undefined;
 }

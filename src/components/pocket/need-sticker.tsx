@@ -10,7 +10,7 @@ const TILTS = ["-rotate-1", "rotate-1", "-rotate-[0.5deg]", "rotate-[1.5deg]", "
 
 interface Props {
   stats: DesireStats;
-  hint?: string;
+  hint?: string | undefined;
   index: number;
   selected?: boolean;
   dimmed?: boolean;
@@ -34,11 +34,15 @@ export function NeedSticker({ stats, hint, index, selected, dimmed, onOpen }: Pr
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className={cn("grid size-12 place-items-center rounded-2xl", TONE_SURFACE[meta.tone])}>
+        <span
+          className={cn("grid size-12 place-items-center rounded-2xl", TONE_SURFACE[meta.tone])}
+        >
           <Icon className="size-6" aria-hidden />
         </span>
         <span className="tabular text-right">
-          <span className="block font-display text-3xl font-semibold leading-none">{stats.mentions}</span>
+          <span className="block font-display text-3xl font-semibold leading-none">
+            {stats.mentions}
+          </span>
           <span className="text-[11px] text-muted-foreground">of {stats.total} records</span>
         </span>
       </div>
@@ -47,11 +51,15 @@ export function NeedSticker({ stats, hint, index, selected, dimmed, onOpen }: Pr
       <dl className="mt-3 grid grid-cols-2 gap-2 text-xs tabular">
         <div className="rounded-xl bg-muted/70 px-2.5 py-1.5">
           <dt className="text-muted-foreground">Must-have</dt>
-          <dd className="font-semibold">{stats.mustHave} / {stats.mentions}</dd>
+          <dd className="font-semibold">
+            {stats.mustHave} / {stats.mentions}
+          </dd>
         </div>
         <div className="rounded-xl bg-muted/70 px-2.5 py-1.5">
           <dt className="text-muted-foreground">Reported unmet</dt>
-          <dd className="font-semibold">{stats.unmet} / {stats.mentions}</dd>
+          <dd className="font-semibold">
+            {stats.unmet} / {stats.mentions}
+          </dd>
         </div>
       </dl>
       <div className="mt-auto pt-3">
@@ -61,7 +69,9 @@ export function NeedSticker({ stats, hint, index, selected, dimmed, onOpen }: Pr
               {sources.map((s, i) => (
                 <div
                   key={s}
-                  className={cn(TONE_BAR[(["navy", "orange", "lavender", "sage", "butter"] as const)[i % 5]])}
+                  className={cn(
+                    TONE_BAR[(["navy", "orange", "lavender", "sage", "butter"] as const)[i % 5]!],
+                  )}
                   style={{ width: `${(stats.bySource[s] / stats.mentions) * 100}%` }}
                 />
               ))}

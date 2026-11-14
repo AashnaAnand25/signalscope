@@ -1,24 +1,46 @@
-# Pixel Perfect Palette Playback
+# SignalScope
 
-Implement exactly the screenshot and nothing else
+Customer evidence. Clearer decisions.
 
-This project was built with [Lovable](https://lovable.dev).
+A corporate consumer-intelligence workspace for the Kearney × PERLab Consumer Insights challenge. Reviews, product questions, discussions, and survey responses connect to customer desires, evidence gaps, and product experiments. The campus backpack is a fictional demonstration product.
 
-## Build with Lovable
+## Local setup
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/afdd1bf2-0880-4343-81a9-0eb850a6fb3e).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requires Node 22+ and Bun.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install
+bun run dev
 ```
+
+Default URL: http://127.0.0.1:8081/
+
+```sh
+bun run typecheck
+bun run test
+bun run lint
+bun run build
+bun run start
+```
+
+Production output: `.output/` (Nitro Node server). No database or API key is required for the local demo.
+
+## What works
+
+- Overview with a configurable product and evidence-derived summaries.
+- Ten desire categories, source filtering, supporting records, and counterexamples.
+- Journey coverage with measured vs unavailable metrics.
+- Evidence search, reviewer tag edits, and side-by-side conflicts.
+- Opportunities with supporting/contradicting records, bookmarks, and research status.
+- Two-step voluntary survey, actual-use question, validated local persistence, copy link and generated QR.
+- Data workspace with validated JSON imports and evidence/metric exports.
+
+All seeded evidence is synthetic. Survey responses and imports persist only in the same browser. A QR code opens the URL on another device but does not create a shared backend. The name is a working product name, not a trademark availability claim.
+
+## Import evidence
+
+Open Data workspace, download its example, replace it with permitted evidence, and import the JSON array. Keep stable unique IDs and the selected product ID. Preserve source/origin/coding classifications. Public source URLs must use HTTPS. Import does not verify claims or grant permission to reuse text. Retain citations and use only permitted sources.
+
+## Teammate work
+
+See [backend/data handoff](docs/TEAMMATE_BACKEND_PROMPT.md) for the separate shared-persistence and extraction task. No real external corpus, live model, or shared backend is currently connected.

@@ -43,7 +43,8 @@ export interface JourneyTransition {
 export function buildJourney(records: EvidenceRecord[], responses: SurveyResponse[]) {
   const n = (f: (r: SurveyResponse) => boolean) => responses.filter(f).length;
   const passages = records.filter((r) => r.sourceType !== "survey");
-  const stated = (j: JourneyContext) => passages.filter((r) => r.journey === j && r.journeyBasis === "stated").length;
+  const stated = (j: JourneyContext) =>
+    passages.filter((r) => r.journey === j && r.journeyBasis === "stated").length;
   const reviews = passages.filter((r) => r.sourceType === "review");
   const surveySrc = "Voluntary survey (self-report)";
 
@@ -54,11 +55,17 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       group: "discovery",
       definition: "Had not heard of this specific product before taking the survey.",
       requiredData: "Prior-awareness question asked before the product is shown.",
-      denominator: "Survey respondents who answered the awareness question",
+      denominator: "Survey responses who answered the awareness question",
       timeWindow: "At time of survey",
       limitation: "No recorded activity doesn't prove someone is unaware.",
       measures: [
-        { label: "Said they hadn't heard of it", count: n((r) => r.awareness === "no"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Said they hadn't heard of it",
+          count: n((r) => r.awareness === "no"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Awareness of people outside the survey"],
       leadsTo: ["discovered", "access"],
@@ -69,11 +76,17 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       group: "discovery",
       definition: "Encountered the product through a listing, search, post or person.",
       requiredData: "Exposure records (impressions, page visits) or self-reported encounter.",
-      denominator: "Survey respondents who answered the awareness question",
+      denominator: "Survey responses who answered the awareness question",
       timeWindow: "Any time before the survey",
       limitation: "An impression doesn't prove someone noticed the product.",
       measures: [
-        { label: "Said they'd heard of it", count: n((r) => r.awareness === "yes"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Said they'd heard of it",
+          count: n((r) => r.awareness === "yes"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Impression / session logs — not in this dataset"],
       leadsTo: ["not-interested", "interested"],
@@ -84,11 +97,17 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       group: "discovery",
       definition: "Has the product through a gift, borrowing, sharing or a demo.",
       requiredData: "Asking how access was obtained.",
-      denominator: "Survey respondents",
+      denominator: "Survey responses",
       timeWindow: "At time of survey",
       limitation: "Access source is often absent from transaction records.",
       measures: [
-        { label: "Reported access another way", count: n((r) => r.experience === "accessed-other"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Reported access another way",
+          count: n((r) => r.experience === "accessed-other"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: [],
       leadsTo: ["activated"],
@@ -99,11 +118,17 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       group: "consideration",
       definition: "Explicitly said the product isn't relevant to them.",
       requiredData: "An explicit statement — ignoring or leaving a page is not enough.",
-      denominator: "Survey respondents",
+      denominator: "Survey responses",
       timeWindow: "At time of survey",
       limitation: "No click does not mean not interested.",
       measures: [
-        { label: "Said it isn't relevant", count: n((r) => r.experience === "not-interested"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Said it isn't relevant",
+          count: n((r) => r.experience === "not-interested"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: [],
       leadsTo: ["interested"],
@@ -117,9 +142,16 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       requiredData: "Click/save events or self-reported interest.",
       denominator: "People who discovered the product",
       timeWindow: "Defined window after discovery",
-      limitation: "Actions are indicators, not proof of intent. A public question doesn't establish purchase status.",
+      limitation:
+        "Actions are indicators, not proof of intent. A public question doesn't establish purchase status.",
       measures: [
-        { label: "Public product questions asked", count: passages.filter((r) => r.sourceType === "qa").length, unit: "Q&A passages", source: "Q&A (inferred signal)", evidenceType: "inferred" },
+        {
+          label: "Public product questions asked",
+          count: passages.filter((r) => r.sourceType === "qa").length,
+          unit: "Q&A passages",
+          source: "Q&A (inferred signal)",
+          evidenceType: "inferred",
+        },
       ],
       unavailable: ["Click / save events — not in this dataset"],
       leadsTo: ["considering"],
@@ -134,8 +166,20 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       timeWindow: "Defined window after discovery",
       limitation: "Browsing can have other purposes.",
       measures: [
-        { label: "Said they considered it", count: n((r) => r.experience === "considered"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
-        { label: "Passages written while considering", count: stated("consideration"), unit: "passages", source: "Reviews & discussion", evidenceType: "self-reported" },
+        {
+          label: "Said they considered it",
+          count: n((r) => r.experience === "considered"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
+        {
+          label: "Passages written while considering",
+          count: stated("consideration"),
+          unit: "passages",
+          source: "Reviews & discussion",
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Comparison / spec-view events"],
       leadsTo: ["not-purchased", "purchased"],
@@ -165,7 +209,13 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       timeWindow: "Defined purchase window",
       limitation: "Purchase doesn't establish actual use.",
       measures: [
-        { label: "Said they purchased it", count: n((r) => r.experience === "purchased"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Said they purchased it",
+          count: n((r) => r.experience === "purchased"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Order records — not in this dataset"],
       leadsTo: ["activated", "unused"],
@@ -193,8 +243,20 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       timeWindow: "Defined window after access",
       limitation: "Physical-product use usually requires self-report.",
       measures: [
-        { label: "Passages describing use", count: stated("use"), unit: "passages", source: "Reviews & discussion", evidenceType: "self-reported" },
-        { label: "Respondents describing use", count: n((r) => !!r.usageNotes), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Passages describing use",
+          count: stated("use"),
+          unit: "passages",
+          source: "Reviews & discussion",
+          evidenceType: "self-reported",
+        },
+        {
+          label: "Respondents describing use",
+          count: n((r) => !!r.usageNotes),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Usage diaries or follow-ups of all owners"],
       leadsTo: ["support", "feedback"],
@@ -223,7 +285,13 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       timeWindow: "Defined usage period",
       limitation: "Many people never contact support.",
       measures: [
-        { label: "Passages describing a problem needing help", count: stated("support"), unit: "passages", source: "Reviews", evidenceType: "self-reported" },
+        {
+          label: "Passages describing a problem needing help",
+          count: stated("support"),
+          unit: "passages",
+          source: "Reviews",
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Support tickets — not in this dataset"],
       leadsTo: ["activated", "churned"],
@@ -239,10 +307,34 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       timeWindow: "Defined period after use",
       limitation: "Ratings can contain mixed experiences; keep mixed separate.",
       measures: [
-        { label: "Positive reviews", count: reviews.filter((r) => r.tone === "positive").length, unit: "reviews", source: "Review collection", evidenceType: "observed" },
-        { label: "Mixed reviews", count: reviews.filter((r) => r.tone === "mixed").length, unit: "reviews", source: "Review collection", evidenceType: "observed" },
-        { label: "Negative reviews", count: reviews.filter((r) => r.tone === "negative").length, unit: "reviews", source: "Review collection", evidenceType: "observed" },
-        { label: "Said they posted feedback", count: n((r) => r.posted === "posted-publicly"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Positive reviews",
+          count: reviews.filter((r) => r.tone === "positive").length,
+          unit: "reviews",
+          source: "Review collection",
+          evidenceType: "observed",
+        },
+        {
+          label: "Mixed reviews",
+          count: reviews.filter((r) => r.tone === "mixed").length,
+          unit: "reviews",
+          source: "Review collection",
+          evidenceType: "observed",
+        },
+        {
+          label: "Negative reviews",
+          count: reviews.filter((r) => r.tone === "negative").length,
+          unit: "reviews",
+          source: "Review collection",
+          evidenceType: "observed",
+        },
+        {
+          label: "Said they posted feedback",
+          count: n((r) => r.posted === "posted-publicly"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Count of eligible users (needed for a feedback rate)"],
       leadsTo: ["advocate"],
@@ -255,9 +347,16 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       requiredData: "Confirmed use plus absence of feedback within a defined period.",
       denominator: "Eligible confirmed users",
       timeWindow: "Defined feedback window",
-      limitation: "No review does not mean satisfaction — they may comment elsewhere or not at all.",
+      limitation:
+        "No review does not mean satisfaction — they may comment elsewhere or not at all.",
       measures: [
-        { label: "Users who said they didn't post", count: n((r) => r.posted === "no"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Users who said they didn't post",
+          count: n((r) => r.posted === "no"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Owner list to identify silent users beyond the survey"],
       leadsTo: ["repeat"],
@@ -272,7 +371,13 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       timeWindow: "Defined period",
       limitation: "A positive review alone doesn't establish advocacy.",
       measures: [
-        { label: "Said they told someone", count: n((r) => r.posted === "told-someone"), unit: "respondents", source: surveySrc, evidenceType: "self-reported" },
+        {
+          label: "Said they told someone",
+          count: n((r) => r.posted === "told-someone"),
+          unit: "survey responses",
+          source: surveySrc,
+          evidenceType: "self-reported",
+        },
       ],
       unavailable: ["Referral tracking"],
       leadsTo: ["repeat"],
@@ -326,20 +431,64 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
       to: "considering",
       label: "Heard of it → considered, purchased or has one",
       measurable: {
-        numerator: aware.filter((r) => ["considered", "purchased", "accessed-other"].includes(r.experience)).length,
+        numerator: aware.filter((r) =>
+          ["considered", "purchased", "accessed-other"].includes(r.experience),
+        ).length,
         denominator: aware.length,
         unit: "respondents who'd heard of it",
         source: "Voluntary survey (self-report)",
       },
       dataNeeded: "Available within the survey sample only.",
     },
-    { from: "considering", to: "purchased", label: "Considering → purchased", measurable: false, dataNeeded: "Consideration events and orders linked to the same people within a set window." },
-    { from: "purchased", to: "activated", label: "Purchased → activated", measurable: false, dataNeeded: "Buyers with complete follow-up about first use." },
-    { from: "activated", to: "feedback", label: "Using → left feedback", measurable: false, dataNeeded: "A list of confirmed users eligible to give feedback, plus their submissions." },
-    { from: "activated", to: "support", label: "Using → needed support", measurable: false, dataNeeded: "Support requests linked to confirmed users." },
-    { from: "feedback", to: "advocate", label: "Positive review → recommended", measurable: false, dataNeeded: "Referral tracking or a recommendation question for reviewers." },
-    { from: "purchased", to: "returned", label: "Purchased → returned", measurable: false, dataNeeded: "Return records ÷ eligible fulfilled orders." },
-    { from: "repeat", to: "activated", label: "Repeat purchase → next cycle", measurable: false, dataNeeded: "Linked order history per customer." },
+    {
+      from: "considering",
+      to: "purchased",
+      label: "Considering → purchased",
+      measurable: false,
+      dataNeeded: "Consideration events and orders linked to the same people within a set window.",
+    },
+    {
+      from: "purchased",
+      to: "activated",
+      label: "Purchased → activated",
+      measurable: false,
+      dataNeeded: "Buyers with complete follow-up about first use.",
+    },
+    {
+      from: "activated",
+      to: "feedback",
+      label: "Using → left feedback",
+      measurable: false,
+      dataNeeded: "A list of confirmed users eligible to give feedback, plus their submissions.",
+    },
+    {
+      from: "activated",
+      to: "support",
+      label: "Using → needed support",
+      measurable: false,
+      dataNeeded: "Support requests linked to confirmed users.",
+    },
+    {
+      from: "feedback",
+      to: "advocate",
+      label: "Positive review → recommended",
+      measurable: false,
+      dataNeeded: "Referral tracking or a recommendation question for reviewers.",
+    },
+    {
+      from: "purchased",
+      to: "returned",
+      label: "Purchased → returned",
+      measurable: false,
+      dataNeeded: "Return records ÷ eligible fulfilled orders.",
+    },
+    {
+      from: "repeat",
+      to: "activated",
+      label: "Repeat purchase → next cycle",
+      measurable: false,
+      dataNeeded: "Linked order history per customer.",
+    },
   ];
 
   return { nodes, transitions };

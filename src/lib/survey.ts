@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { DESIRE_IDS, type EvidenceRecord, type JourneyContext, type ProductConfig, type SurveyResponse } from "./types";
+import {
+  DESIRE_IDS,
+  type EvidenceRecord,
+  type JourneyContext,
+  type ProductConfig,
+  type SurveyResponse,
+} from "./types";
 
 export const AWARENESS_OPTIONS = [
   { value: "yes", label: "Yes, I'd heard of it" },
@@ -22,8 +28,8 @@ export const POSTED_OPTIONS = [
 ] as const;
 
 /** Users of the product: only these are asked usage questions. */
-export function hasUsedProduct(experience: string | undefined) {
-  return experience === "purchased" || experience === "accessed-other";
+export function hasUsedProduct(experience: string | undefined, used?: string) {
+  return used === "yes" && (experience === "purchased" || experience === "accessed-other");
 }
 
 const text = z
@@ -38,12 +44,16 @@ export const surveySchema = z
     awareness: z.enum(["yes", "no", "not-sure"], { required_error: "Please choose an answer." }),
     discovery: z.string().max(40).optional(),
     topDesire: z.enum(DESIRE_IDS, { required_error: "Please pick what matters most." }),
-    priceRange: z.string({ required_error: "Please choose a price range." }).min(1, "Please choose a price range.").max(20),
+    priceRange: z
+      .string({ required_error: "Please choose a price range." })
+      .min(1, "Please choose a price range.")
+      .max(20),
     needToKnow: text,
     experience: z.enum(
       ["never-encountered", "not-interested", "considered", "purchased", "accessed-other"],
       { required_error: "Please choose the option that fits best." },
     ),
+    usedProduct: z.enum(["yes", "no"]).optional(),
     usageNotes: text,
     posted: z.enum(["posted-publicly", "told-someone", "no"]).optional(),
   })
@@ -51,22 +61,26 @@ export const surveySchema = z
     ...v,
     // Discovery only applies to people who'd heard of it; usage only to people who used it.
     discovery: v.awareness === "yes" ? v.discovery : undefined,
-    usageNotes: hasUsedProduct(v.experience) ? v.usageNotes : undefined,
-    posted: hasUsedProduct(v.experience) ? v.posted : undefined,
+    usedProduct: ["purchased", "accessed-other"].includes(v.experience) ? v.usedProduct : undefined,
+    usageNotes: hasUsedProduct(v.experience, v.usedProduct) ? v.usageNotes : undefined,
+    posted: hasUsedProduct(v.experience, v.usedProduct) ? v.posted : undefined,
   }));
 
 export type SurveyInput = z.input<typeof surveySchema>;
 export type SurveyAnswers = z.output<typeof surveySchema>;
 
-function journeyFor(r: SurveyResponse): JourneyContext {
+function journeyFor(r: SurveyResponse): JourneyContext | undefined {
   switch (r.experience) {
     case "considered":
       return "consideration";
     case "purchased":
+      return r.usedProduct === "yes" || r.usageNotes ? "use" : "purchase";
     case "accessed-other":
-      return r.usageNotes ? "use" : "purchase";
-    default:
+      return r.usedProduct === "yes" || r.usageNotes ? "use" : undefined;
+    case "not-interested":
       return "discovery";
+    default:
+      return undefined;
   }
 }
 
@@ -81,7 +95,9 @@ export function surveyToEvidence(r: SurveyResponse, product: ProductConfig): Evi
     id: r.id,
     productId: r.productId,
     sourceType: "survey",
-    text: parts.length ? parts.join(" · ") : "Answered multiple-choice questions only (no free text).",
+    text: parts.length
+      ? parts.join(" · ")
+      : "Answered multiple-choice questions only (no free text).",
     date: r.submittedAt.slice(0, 10),
     journey: journeyFor(r),
     journeyBasis: "stated",

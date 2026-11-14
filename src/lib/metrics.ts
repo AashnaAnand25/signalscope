@@ -48,9 +48,16 @@ export function buildRecords(
   product: ProductConfig,
   responses: SurveyResponse[],
   overrides: Record<string, TagOverride> = {},
+  external: EvidenceRecord[] = [],
 ): EvidenceRecord[] {
-  const survey = responses.filter((r) => r.productId === product.id).map((r) => surveyToEvidence(r, product));
-  return [...product.evidence, ...survey].map((r) => applyOverride(r, overrides[r.id]));
+  const survey = responses
+    .filter((r) => r.productId === product.id)
+    .map((r) => surveyToEvidence(r, product));
+  return [
+    ...product.evidence,
+    ...external.filter((r) => r.productId === product.id),
+    ...survey,
+  ].map((r) => applyOverride(r, overrides[r.id]));
 }
 
 export function hasDesire(r: EvidenceRecord, d: DesireId) {
@@ -63,16 +70,21 @@ export interface DesireStats {
   mentions: number;
   mustHave: number;
   unmet: number;
+  knownFulfillment: number;
   workaround: number;
   dealbreaker: number;
   bySource: Record<SourceType, number>;
 }
 
 export function desireStats(records: EvidenceRecord[], desire: DesireId): DesireStats {
-  const bySource = Object.fromEntries(SOURCE_TYPES.map((s) => [s, 0])) as Record<SourceType, number>;
+  const bySource = Object.fromEntries(SOURCE_TYPES.map((s) => [s, 0])) as Record<
+    SourceType,
+    number
+  >;
   let mentions = 0,
     mustHave = 0,
     unmet = 0,
+    knownFulfillment = 0,
     workaround = 0,
     dealbreaker = 0;
   for (const r of records) {
@@ -82,10 +94,21 @@ export function desireStats(records: EvidenceRecord[], desire: DesireId): Desire
     bySource[r.sourceType]++;
     if (cs.some((c) => c.importance === "must-have")) mustHave++;
     if (cs.some((c) => c.fulfillment === "unmet")) unmet++;
+    if (cs.some((c) => ["met", "partly-met", "unmet"].includes(c.fulfillment))) knownFulfillment++;
     if (cs.some((c) => c.dealbreaker)) dealbreaker++;
     if (r.workaround) workaround++;
   }
-  return { desire, total: records.length, mentions, mustHave, unmet, workaround, dealbreaker, bySource };
+  return {
+    desire,
+    total: records.length,
+    mentions,
+    mustHave,
+    unmet,
+    knownFulfillment,
+    workaround,
+    dealbreaker,
+    bySource,
+  };
 }
 
 export function allDesireStats(records: EvidenceRecord[]) {
@@ -97,8 +120,8 @@ export function coOccurrence(records: EvidenceRecord[]) {
   const pairs: { a: DesireId; b: DesireId; count: number }[] = [];
   for (let i = 0; i < DESIRE_IDS.length; i++) {
     for (let j = i + 1; j < DESIRE_IDS.length; j++) {
-      const a = DESIRE_IDS[i],
-        b = DESIRE_IDS[j];
+      const a = DESIRE_IDS[i]!,
+        b = DESIRE_IDS[j]!;
       const count = records.filter((r) => hasDesire(r, a) && hasDesire(r, b)).length;
       if (count) pairs.push({ a, b, count });
     }
@@ -108,18 +131,30 @@ export function coOccurrence(records: EvidenceRecord[]) {
 
 /** Stated budgets bucketed into the product's survey price ranges. Stated ≠ willingness to pay. */
 export function priceDistribution(records: EvidenceRecord[], product: ProductConfig) {
-  const ranges = product.survey.priceRanges.filter((p) => p.min !== undefined || p.max !== undefined);
-  const withBudget = records.filter((r) => r.budget);
-  const buckets = ranges.map((range) => ({
-    value: range.value,
-    label: range.label,
-    count: withBudget.filter((r) => {
-      const b = r.budget!;
-      const point = b.max ?? b.min ?? 0;
-      return (range.min === undefined || point >= range.min) && (range.max === undefined || point <= range.max);
-    }).length,
-  }));
-  return { buckets, denominator: withBudget.length };
+  const ranges = product.survey.priceRanges.filter(
+    (p) => p.min !== undefined || p.max !== undefined,
+  );
+  const budgets = records.filter(
+    (r) => r.budget && (r.budget.min !== undefined || r.budget.max !== undefined),
+  );
+  const assignments = budgets.map((r) => {
+    const b = r.budget!;
+    const exact = ranges.findIndex((p) => b.label === `Would consider ${p.label}`);
+    if (exact >= 0) return exact;
+    const point = b.max ?? b.min!;
+    return ranges.findIndex(
+      (p) => (p.min === undefined || point >= p.min) && (p.max === undefined || point <= p.max),
+    );
+  });
+  return {
+    buckets: ranges.map((r, i) => ({
+      value: r.value,
+      label: r.label,
+      count: assignments.filter((a) => a === i).length,
+    })),
+    denominator: budgets.length,
+    unclassified: assignments.filter((i) => i < 0).length,
+  };
 }
 
 /** Desire mentions by journey context, using only contexts the record states. */
@@ -127,7 +162,11 @@ export function desireByJourney(records: EvidenceRecord[], desire: DesireId) {
   const stated = records.filter((r) => r.journey && r.journeyBasis === "stated");
   return JOURNEY_CONTEXTS.map((j) => {
     const inStage = stated.filter((r) => r.journey === j);
-    return { journey: j, mentions: inStage.filter((r) => hasDesire(r, desire)).length, total: inStage.length };
+    return {
+      journey: j,
+      mentions: inStage.filter((r) => hasDesire(r, desire)).length,
+      total: inStage.length,
+    };
   }).filter((row) => row.total > 0);
 }
 
@@ -146,7 +185,11 @@ export function summarize(product: ProductConfig, records: EvidenceRecord[]): Su
   const passages = records.filter((r) => r.sourceType !== "survey");
   const survey = records.filter((r) => r.sourceType === "survey");
   const needs = new Set(
-    passages.flatMap((r) => r.codings.filter((c) => !c.need.startsWith("Reviewer-added")).map((c) => `${c.desire}:${c.need}`)),
+    passages.flatMap((r) =>
+      r.codings
+        .filter((c) => !c.need.startsWith("Reviewer-added"))
+        .map((c) => `${c.desire}:${c.need}`),
+    ),
   );
   return {
     evidenceRecords: records.length,
@@ -155,30 +198,38 @@ export function summarize(product: ProductConfig, records: EvidenceRecord[]): Su
     surveyCollected: survey.filter((r) => r.origin === "collected").length,
     needsIdentified: needs.size,
     categoriesWithEvidence: DESIRE_IDS.filter((d) => records.some((r) => hasDesire(r, d))).length,
-    unansweredQuestions: passages.filter((r) => r.sourceType === "qa" && r.answered === false).length,
+    unansweredQuestions: passages.filter((r) => r.sourceType === "qa" && r.answered === false)
+      .length,
     unresolvedConflicts: product.conflicts.length,
   };
 }
 
 export function dateRange(records: EvidenceRecord[]) {
-  const dates = records.map((r) => r.date).filter((d): d is string => !!d).sort();
+  const dates = records
+    .map((r) => r.date)
+    .filter((d): d is string => !!d)
+    .sort();
   return { from: dates[0], to: dates[dates.length - 1], undated: records.length - dates.length };
 }
 
-/** Survey respondents whose "matters most" pick matches a desire. */
+/** Survey responses whose "matters most" pick matches a desire. */
 export function surveyPicks(records: EvidenceRecord[], desire: DesireId): Fraction {
   const survey = records.filter((r) => r.sourceType === "survey");
   return {
     numerator: survey.filter((r) => hasDesire(r, desire)).length,
     denominator: survey.length,
-    unit: "survey respondents",
+    unit: "survey responses",
   };
 }
 
 export function opportunityEvidence(o: Opportunity, records: EvidenceRecord[]) {
   const byId = new Map(records.map((r) => [r.id, r]));
-  const supporting = o.supportingIds.map((id) => byId.get(id)).filter((r): r is EvidenceRecord => !!r);
-  const contradicting = o.contradictingIds.map((id) => byId.get(id)).filter((r): r is EvidenceRecord => !!r);
+  const supporting = o.supportingIds
+    .map((id) => byId.get(id))
+    .filter((r): r is EvidenceRecord => !!r);
+  const contradicting = o.contradictingIds
+    .map((id) => byId.get(id))
+    .filter((r): r is EvidenceRecord => !!r);
   const survey = o.surveySupportDesire ? surveyPicks(records, o.surveySupportDesire) : undefined;
   return { supporting, contradicting, survey };
 }
@@ -186,7 +237,11 @@ export function opportunityEvidence(o: Opportunity, records: EvidenceRecord[]) {
 export function rankOpportunities(opps: Opportunity[], records: EvidenceRecord[]) {
   return [...opps]
     .map((o) => ({ o, ev: opportunityEvidence(o, records) }))
-    .sort((a, b) => b.ev.supporting.length - a.ev.supporting.length || (b.ev.survey?.numerator ?? 0) - (a.ev.survey?.numerator ?? 0));
+    .sort(
+      (a, b) =>
+        b.ev.supporting.length - a.ev.supporting.length ||
+        (b.ev.survey?.numerator ?? 0) - (a.ev.survey?.numerator ?? 0),
+    );
 }
 
 export function pct(f: Fraction) {

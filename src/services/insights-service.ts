@@ -1,4 +1,5 @@
-import type { DesireCoding, OpportunityStatus, SurveyResponse } from "@/lib/types";
+import { persistedSchema } from "@/lib/validation";
+import type { DesireCoding, OpportunityStatus, SurveyResponse, EvidenceRecord } from "@/lib/types";
 import type { TagOverride } from "@/lib/metrics";
 
 /**
@@ -9,6 +10,7 @@ import type { TagOverride } from "@/lib/metrics";
 export interface PersistedState {
   productId: string;
   responses: SurveyResponse[];
+  externalRecords: EvidenceRecord[];
   tagOverrides: Record<string, TagOverride>;
   opportunityStatus: Record<string, OpportunityStatus>;
   bookmarks: string[];
@@ -27,29 +29,37 @@ export interface InsightsService {
 export interface DesireExtractionResult {
   available: false;
   reason: string;
-} 
+}
 
 /**
  * Integration point for a future backend that extracts desires from supplied text.
  * No AI service is connected in this demo, so this never simulates an analysis call:
  * all tags shown are pre-coded demo tags, respondent selections or reviewer edits.
  */
-export async function extractDesires(_text: string): Promise<DesireExtractionResult | { available: true; codings: DesireCoding[] }> {
+export async function extractDesires(
+  _text: string,
+): Promise<DesireExtractionResult | { available: true; codings: DesireCoding[] }> {
   return {
     available: false,
-    reason: "No analysis service is connected. Tags in this demo are pre-coded, respondent-selected or reviewer-edited.",
+    reason:
+      "No analysis service is connected. Tags in this demo are pre-coded, respondent-selected or reviewer-edited.",
   };
 }
 
 const KEY = "the-missing-pocket:v1";
 
+let storageAvailable = true;
 export const localService: InsightsService = {
   mode: "local",
-  storageNotice: "Local demo: responses stay in this browser.",
+  get storageNotice() {
+    return storageAvailable
+      ? "Local demo: responses stay in this browser."
+      : "Browser storage unavailable: changes last only for this visit.";
+  },
   load() {
     try {
       const raw = window.localStorage.getItem(KEY);
-      return raw ? (JSON.parse(raw) as PersistedState) : null;
+      return raw ? (persistedSchema.parse(JSON.parse(raw)) as PersistedState) : null;
     } catch {
       return null;
     }
@@ -58,6 +68,7 @@ export const localService: InsightsService = {
     try {
       window.localStorage.setItem(KEY, JSON.stringify(state));
     } catch {
+      storageAvailable = false;
       /* storage full or unavailable — the demo keeps working in memory */
     }
   },

@@ -23,7 +23,14 @@ interface Props {
   index?: number;
 }
 
-export function EvidenceCard({ record, onEditTags, compact, highlight, className, index = 0 }: Props) {
+export function EvidenceCard({
+  record,
+  onEditTags,
+  compact,
+  highlight,
+  className,
+  index = 0,
+}: Props) {
   const { product } = useDemo();
   const cls = CLASS_META[record.classification];
   const desires = Array.from(new Set(record.codings.map((c) => c.desire)));
@@ -40,7 +47,9 @@ export function EvidenceCard({ record, onEditTags, compact, highlight, className
       <header className="flex flex-wrap items-center gap-1.5 text-xs">
         <span className="font-mono font-semibold text-foreground">{record.id}</span>
         <span className="text-muted-foreground">· {product.shortName}</span>
-        <Badge variant="navy" className="ml-auto">{SOURCE_LABEL[record.sourceType]}</Badge>
+        <Badge variant="navy" className="ml-auto">
+          {SOURCE_LABEL[record.sourceType]}
+        </Badge>
         {record.origin === "collected" ? (
           <Badge variant="orange">Collected here</Badge>
         ) : (
@@ -64,10 +73,15 @@ export function EvidenceCard({ record, onEditTags, compact, highlight, className
       {!compact && (
         <ul className="mt-3 space-y-1.5 text-sm">
           {record.codings.map((c, i) => (
-            <li key={i} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
+            <li
+              key={i}
+              className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground"
+            >
               <span className="font-medium text-foreground">{c.need}</span>
               {c.target && <span>· target: {c.target}</span>}
-              <Badge variant={FULFILLMENT_META[c.fulfillment].tone}>{FULFILLMENT_META[c.fulfillment].label}</Badge>
+              <Badge variant={FULFILLMENT_META[c.fulfillment].tone}>
+                {FULFILLMENT_META[c.fulfillment].label}
+              </Badge>
               {c.importance === "must-have" && <Badge variant="outline">Must-have</Badge>}
               {c.dealbreaker && <Badge variant="orange">Stated dealbreaker</Badge>}
               {c.tradeoff && <span className="w-full text-xs">Trade-off: {c.tradeoff}</span>}
@@ -80,12 +94,18 @@ export function EvidenceCard({ record, onEditTags, compact, highlight, className
         <div className="mt-3 space-y-1 text-sm">
           {record.barrier && (
             <p className="flex items-start gap-1.5 text-rust">
-              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden /> <span><span className="font-semibold">Barrier:</span> {record.barrier}</span>
+              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />{" "}
+              <span>
+                <span className="font-semibold">Barrier:</span> {record.barrier}
+              </span>
             </p>
           )}
           {record.workaround && (
             <p className="flex items-start gap-1.5 text-sage-strong">
-              <Wrench className="mt-0.5 size-4 shrink-0" aria-hidden /> <span><span className="font-semibold">Workaround:</span> {record.workaround}</span>
+              <Wrench className="mt-0.5 size-4 shrink-0" aria-hidden />{" "}
+              <span>
+                <span className="font-semibold">Workaround:</span> {record.workaround}
+              </span>
             </p>
           )}
         </div>
@@ -94,22 +114,40 @@ export function EvidenceCard({ record, onEditTags, compact, highlight, className
       <footer className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t-2 border-dashed border-border pt-3 text-xs text-muted-foreground">
         <span>{formatDate(record.date)}</span>
         <span>
-          {record.journey ? `${JOURNEY_LABEL[record.journey]}${record.journeyBasis === "inferred" ? " (inferred)" : ""}` : "Journey context unknown"}
+          {record.journey
+            ? `${JOURNEY_LABEL[record.journey]}${record.journeyBasis === "inferred" ? " (inferred)" : ""}`
+            : "Journey context unknown"}
         </span>
         <Badge variant={cls.tone}>{cls.label}</Badge>
-        <span className={cn(record.codingStatus === "human-reviewed" && "font-semibold text-sage-strong")}>
+        <span
+          className={cn(
+            record.codingStatus === "human-reviewed" && "font-semibold text-sage-strong",
+          )}
+        >
           {CODING_LABEL[record.codingStatus]}
         </span>
-        {record.sourceType === "qa" && <span>{record.answered ? "Answered in thread" : "Unanswered"}</span>}
+        {record.sourceType === "qa" && (
+          <span>{record.answered ? "Answered in thread" : "Unanswered"}</span>
+        )}
         {record.sourceUrl ? (
-          <a href={record.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 underline">
+          <a
+            href={record.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 underline"
+          >
             Source <ExternalLink className="size-3" />
           </a>
         ) : (
           <span>No source URL (synthetic)</span>
         )}
         {onEditTags && (
-          <Button size="sm" variant="ghost" className="ml-auto h-7 px-2.5" onClick={() => onEditTags(record)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="ml-auto h-7 px-2.5"
+            onClick={() => onEditTags(record)}
+          >
             <PencilLine /> Review tags
           </Button>
         )}

@@ -7,5 +7,5 @@ export const PRODUCTS: ProductConfig[] = [campusBackpack];
 export const SEEDED_SURVEY_RESPONSES: SurveyResponse[] = seededSurveyResponses;
 
 export function getProduct(id: string | undefined): ProductConfig {
-  return PRODUCTS.find((p) => p.id === id) ?? PRODUCTS[0];
+  return PRODUCTS.find((p) => p.id === id) ?? PRODUCTS[0]!;
 }

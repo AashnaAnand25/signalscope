@@ -1,8 +1,24 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { parseEvidenceImport, validateResponse } from "./validation";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { PRODUCTS, SEEDED_SURVEY_RESPONSES, getProduct } from "@/data/products";
 import { insightsService, type PersistedState } from "@/services/insights-service";
 import { buildRecords, type TagOverride } from "./metrics";
-import type { DesireId, EvidenceRecord, OpportunityStatus, ProductConfig, SurveyResponse } from "./types";
+import type {
+  DesireId,
+  EvidenceRecord,
+  OpportunityStatus,
+  ProductConfig,
+  SurveyResponse,
+} from "./types";
 
 export const TRAIL_STEPS = [
   { id: "explore", label: "Explore the product", to: "/" },
@@ -22,7 +38,14 @@ export interface EvidenceFilters {
   classification: string;
   reviewed: string;
 }
-export const EMPTY_FILTERS: EvidenceFilters = { q: "", source: "all", desire: "all", journey: "all", classification: "all", reviewed: "all" };
+export const EMPTY_FILTERS: EvidenceFilters = {
+  q: "",
+  source: "all",
+  desire: "all",
+  journey: "all",
+  classification: "all",
+  reviewed: "all",
+};
 
 interface Ctx {
   hydrated: boolean;
@@ -33,6 +56,7 @@ interface Ctx {
   responses: SurveyResponse[];
   collectedResponses: SurveyResponse[];
   records: EvidenceRecord[];
+  importRecords: (input: unknown) => number;
   addResponse: (r: SurveyResponse) => void;
   tagOverrides: Record<string, TagOverride>;
   setTags: (recordId: string, desires: DesireId[]) => void;
@@ -55,7 +79,8 @@ const StoreContext = createContext<Ctx | null>(null);
 
 export function DemoStoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
-  const [productId, setProductId] = useState(PRODUCTS[0].id);
+  const [productId, setProductId] = useState(PRODUCTS[0]!.id);
+  const [externalRecords, setExternalRecords] = useState<EvidenceRecord[]>([]);
   const [collected, setCollected] = useState<SurveyResponse[]>([]);
   const [tagOverrides, setTagOverrides] = useState<Record<string, TagOverride>>({});
   const [oppStatus, setOppStatus] = useState<Record<string, OpportunityStatus>>({});
@@ -70,6 +95,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     if (s) {
       setProductId(getProduct(s.productId).id);
       setCollected(s.responses ?? []);
+      setExternalRecords(s.externalRecords ?? []);
       setTagOverrides(s.tagOverrides ?? {});
       setOppStatus(s.opportunityStatus ?? {});
       setBookmarks(s.bookmarks ?? []);
@@ -80,24 +106,28 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!loaded.current) return;
+    if (!loaded.current || !hydrated) return;
     const state: PersistedState = {
       productId,
       responses: collected,
+      externalRecords,
       tagOverrides,
       opportunityStatus: oppStatus,
       bookmarks,
       trail,
     };
     insightsService.save(state);
-  }, [productId, collected, tagOverrides, oppStatus, bookmarks, trail]);
+  }, [productId, collected, externalRecords, tagOverrides, oppStatus, bookmarks, trail, hydrated]);
 
   const product = getProduct(productId);
   const responses = useMemo(
     () => [...SEEDED_SURVEY_RESPONSES, ...collected].filter((r) => r.productId === product.id),
     [collected, product.id],
   );
-  const records = useMemo(() => buildRecords(product, responses, tagOverrides), [product, responses, tagOverrides]);
+  const records = useMemo(
+    () => buildRecords(product, responses, tagOverrides, externalRecords),
+    [product, responses, tagOverrides, externalRecords],
+  );
 
   const markTrail = useCallback((step: TrailStep) => {
     setTrail((t) => (t[step] ? t : { ...t, [step]: true }));
@@ -111,7 +141,20 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     responses,
     collectedResponses: collected.filter((r) => r.productId === product.id),
     records,
-    addResponse: (r) => setCollected((c) => [...c, r]),
+    addResponse: (r) => {
+      const validated = validateResponse(r);
+      if (validated.productId !== product.id) throw new Error("Response product mismatch.");
+      setCollected((c) => (c.some((x) => x.id === r.id) ? c : [...c, validated]));
+    },
+    importRecords: (input) => {
+      const imported = parseEvidenceImport(
+        input,
+        product.id,
+        records.map((r) => r.id),
+      );
+      setExternalRecords((r) => [...r, ...imported]);
+      return imported.length;
+    },
     tagOverrides,
     setTags: (id, desires) =>
       setTagOverrides((o) => ({ ...o, [id]: { desires, reviewedAt: new Date().toISOString() } })),
@@ -122,10 +165,13 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
         return next;
       }),
     opportunityStatus: (id) =>
-      oppStatus[id] ?? product.opportunities.find((o) => o.id === id)?.defaultStatus ?? "investigate",
+      oppStatus[id] ??
+      product.opportunities.find((o) => o.id === id)?.defaultStatus ??
+      "investigate",
     setOpportunityStatus: (id, s) => setOppStatus((m) => ({ ...m, [id]: s })),
     bookmarks,
-    toggleBookmark: (id) => setBookmarks((b) => (b.includes(id) ? b.filter((x) => x !== id) : [...b, id])),
+    toggleBookmark: (id) =>
+      setBookmarks((b) => (b.includes(id) ? b.filter((x) => x !== id) : [...b, id])),
     trail,
     markTrail,
     evidenceFilters,
@@ -134,6 +180,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     setDesireSource,
     resetDemo: () => {
       setCollected([]);
+      setExternalRecords([]);
       setTagOverrides({});
       setOppStatus({});
       setBookmarks([]);

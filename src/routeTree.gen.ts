@@ -10,13 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DataRouteImport } from './routes/data'
 import { Route as DesiresRouteImport } from './routes/desires'
 import { Route as EvidenceRouteImport } from './routes/evidence'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as JourneyRouteImport } from './routes/journey'
+import { Route as OpportunitiesRouteImport } from './routes/opportunities'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataRoute = DataRouteImport.update({
+  id: '/data',
+  path: '/data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesiresRoute = DesiresRouteImport.update({
@@ -29,44 +37,88 @@ const EvidenceRoute = EvidenceRouteImport.update({
   path: '/evidence',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JourneyRoute = JourneyRouteImport.update({
   id: '/journey',
   path: '/journey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpportunitiesRoute = OpportunitiesRouteImport.update({
+  id: '/opportunities',
+  path: '/opportunities',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/data': typeof DataRoute
   '/desires': typeof DesiresRoute
   '/evidence': typeof EvidenceRoute
+  '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
+  '/opportunities': typeof OpportunitiesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/data': typeof DataRoute
   '/desires': typeof DesiresRoute
   '/evidence': typeof EvidenceRoute
+  '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
+  '/opportunities': typeof OpportunitiesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/data': typeof DataRoute
   '/desires': typeof DesiresRoute
   '/evidence': typeof EvidenceRoute
+  '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
+  '/opportunities': typeof OpportunitiesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/desires' | '/evidence' | '/journey'
+  fullPaths:
+    | '/'
+    | '/data'
+    | '/desires'
+    | '/evidence'
+    | '/feedback'
+    | '/journey'
+    | '/opportunities'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/desires' | '/evidence' | '/journey'
-  id: '__root__' | '/' | '/desires' | '/evidence' | '/journey'
+  to:
+    | '/'
+    | '/data'
+    | '/desires'
+    | '/evidence'
+    | '/feedback'
+    | '/journey'
+    | '/opportunities'
+  id:
+    | '__root__'
+    | '/'
+    | '/data'
+    | '/desires'
+    | '/evidence'
+    | '/feedback'
+    | '/journey'
+    | '/opportunities'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DataRoute: typeof DataRoute
   DesiresRoute: typeof DesiresRoute
   EvidenceRoute: typeof EvidenceRoute
+  FeedbackRoute: typeof FeedbackRoute
   JourneyRoute: typeof JourneyRoute
+  OpportunitiesRoute: typeof OpportunitiesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data': {
+      id: '/data'
+      path: '/data'
+      fullPath: '/data'
+      preLoaderRoute: typeof DataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desires': {
@@ -92,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EvidenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/journey': {
       id: '/journey'
       path: '/journey'
@@ -99,14 +165,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JourneyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/opportunities': {
+      id: '/opportunities'
+      path: '/opportunities'
+      fullPath: '/opportunities'
+      preLoaderRoute: typeof OpportunitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DataRoute: DataRoute,
   DesiresRoute: DesiresRoute,
   EvidenceRoute: EvidenceRoute,
+  FeedbackRoute: FeedbackRoute,
   JourneyRoute: JourneyRoute,
+  OpportunitiesRoute: OpportunitiesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

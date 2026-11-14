@@ -28,7 +28,10 @@ export function MetricCard({
         <p className="text-sm font-semibold">{label}</p>
       </div>
       <p className="mt-3 tabular">
-        <span key={String(value)} className="inline-block animate-count-bump font-display text-4xl font-semibold leading-none">
+        <span
+          key={String(value)}
+          className="inline-block animate-count-bump font-display text-4xl font-semibold leading-none"
+        >
           {value}
         </span>
         <span className="ml-1.5 text-sm text-muted-foreground">{unit}</span>

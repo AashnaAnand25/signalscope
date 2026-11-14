@@ -741,7 +741,7 @@ export const campusBackpack: ProductConfig = {
     "A fictional orange-and-navy daypack with a padded laptop sleeve, a roomy main compartment, a front organiser pocket and padded shoulder straps. Listed at $78 in this demo.",
   attributes: [
     { label: "Listed price", value: "$78 (fictional)" },
-    { label: "Laptop sleeve", value: "\"Fits most laptops\" — no dimensions listed" },
+    { label: "Laptop sleeve", value: '"Fits most laptops" — no dimensions listed' },
     { label: "Colours", value: "Orange / navy" },
     { label: "Empty weight", value: "Not listed" },
   ],
@@ -798,7 +798,8 @@ export const campusBackpack: ProductConfig = {
     {
       id: "C-WEIGHT",
       title: "Padding or lightness?",
-      issue: "Some passages value thick strap padding and accept the weight; others would give up padding for a lighter bag.",
+      issue:
+        "Some passages value thick strap padding and accept the weight; others would give up padding for a lighter bag.",
       sideA: { label: "More padding, accepts weight", recordIds: ["SYN-R04"] },
       sideB: { label: "Lighter, accepts less padding", recordIds: ["SYN-R05"] },
       desires: ["quality", "convenience"],
@@ -918,16 +919,56 @@ export const campusBackpack: ProductConfig = {
     },
   ],
   researchQuestions: [
-    { id: "RQ-compat", desire: "compatibility", question: "What laptop sizes do people carry, and do they check fit before choosing?" },
-    { id: "RQ-quality", desire: "quality", question: "How much extra weight will people accept for more strap padding?" },
-    { id: "RQ-price", desire: "price", question: "Which budgets do people state before seeing the listed price?" },
-    { id: "RQ-rel", desire: "reliability", question: "What rain conditions do people expect a daypack to handle?" },
-    { id: "RQ-conv", desire: "convenience", question: "Which small items do people need without taking the bag off?" },
-    { id: "RQ-sus", desire: "sustainability", question: "Would people repair a worn part instead of replacing the bag?" },
-    { id: "RQ-app", desire: "appearance", question: "Is the roomy-vs-compact split about different people or different days?" },
-    { id: "RQ-cust", desire: "customization", question: "Would colour options change consideration, or only preference?" },
-    { id: "RQ-feat", desire: "features", question: "Which feature would people give up for a lighter bag?" },
-    { id: "RQ-speed", desire: "speed", question: "Is speed relevant for a backpack at all — e.g., quick access? No evidence yet." },
+    {
+      id: "RQ-compat",
+      desire: "compatibility",
+      question: "What laptop sizes do people carry, and do they check fit before choosing?",
+    },
+    {
+      id: "RQ-quality",
+      desire: "quality",
+      question: "How much extra weight will people accept for more strap padding?",
+    },
+    {
+      id: "RQ-price",
+      desire: "price",
+      question: "Which budgets do people state before seeing the listed price?",
+    },
+    {
+      id: "RQ-rel",
+      desire: "reliability",
+      question: "What rain conditions do people expect a daypack to handle?",
+    },
+    {
+      id: "RQ-conv",
+      desire: "convenience",
+      question: "Which small items do people need without taking the bag off?",
+    },
+    {
+      id: "RQ-sus",
+      desire: "sustainability",
+      question: "Would people repair a worn part instead of replacing the bag?",
+    },
+    {
+      id: "RQ-app",
+      desire: "appearance",
+      question: "Is the roomy-vs-compact split about different people or different days?",
+    },
+    {
+      id: "RQ-cust",
+      desire: "customization",
+      question: "Would colour options change consideration, or only preference?",
+    },
+    {
+      id: "RQ-feat",
+      desire: "features",
+      question: "Which feature would people give up for a lighter bag?",
+    },
+    {
+      id: "RQ-speed",
+      desire: "speed",
+      question: "Is speed relevant for a backpack at all — e.g., quick access? No evidence yet.",
+    },
   ],
   desireHints: {
     features: "Pockets, sleeves and size options",

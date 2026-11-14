@@ -2,12 +2,25 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useDemo } from "@/lib/demo-store";
 import { DESIRE_META } from "@/lib/labels";
 import { DESIRE_IDS, type DesireId, type EvidenceRecord } from "@/lib/types";
 
-export function TagEditor({ record, onClose }: { record: EvidenceRecord | null; onClose: () => void }) {
+export function TagEditor({
+  record,
+  onClose,
+}: {
+  record: EvidenceRecord | null;
+  onClose: () => void;
+}) {
   const { setTags, resetTags, tagOverrides } = useDemo();
   const [selected, setSelected] = useState<DesireId[]>([]);
 
@@ -27,7 +40,9 @@ export function TagEditor({ record, onClose }: { record: EvidenceRecord | null; 
             Correct the desire tags. The original source text below is never changed.
           </DialogDescription>
         </DialogHeader>
-        <blockquote className="rounded-xl border-2 border-dashed bg-muted/60 p-3 text-sm">{record.text}</blockquote>
+        <blockquote className="rounded-xl border-2 border-dashed bg-muted/60 p-3 text-sm">
+          {record.text}
+        </blockquote>
         <fieldset>
           <legend className="mb-2 text-sm font-semibold">Desire tags</legend>
           <div className="grid grid-cols-2 gap-2">
@@ -54,7 +69,8 @@ export function TagEditor({ record, onClose }: { record: EvidenceRecord | null; 
           </div>
         </fieldset>
         <p className="text-xs text-muted-foreground">
-          In this local demo, reviewer edits stay in this browser. With a connected backend, this action would require a signed-in reviewer.
+          In this local demo, reviewer edits stay in this browser. With a connected backend, this
+          action would require a signed-in reviewer.
         </p>
         <DialogFooter className="gap-2">
           {overridden && (

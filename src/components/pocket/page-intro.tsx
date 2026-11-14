@@ -1,14 +1,21 @@
 import { HelpCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PocketPal } from "./pocket-pal";
 
 interface Props {
   eyebrow: string;
   title: string;
   description: ReactNode;
-  guide: { title?: string; points: string[] };
+  guide?: { title?: string; points: string[] };
   actions?: ReactNode;
 }
 
@@ -22,13 +29,19 @@ export function PageIntro({ eyebrow, title, description, guide, actions }: Props
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {actions}
-        <HowToRead {...guide} />
+        {guide && <HowToRead {...guide} />}
       </div>
     </div>
   );
 }
 
-export function HowToRead({ title = "How to read this", points }: { title?: string; points: string[] }) {
+export function HowToRead({
+  title = "How to read this",
+  points,
+}: {
+  title?: string;
+  points: string[];
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -41,7 +54,7 @@ export function HowToRead({ title = "How to read this", points }: { title?: stri
           <PocketPal className="h-14 w-14 shrink-0" mood="curious" />
           <div>
             <DialogTitle className="font-display text-xl">{title}</DialogTitle>
-            <DialogDescription>A few notes from Pocket Pal.</DialogDescription>
+            <DialogDescription>How to interpret this evidence.</DialogDescription>
           </div>
         </DialogHeader>
         <ul className="space-y-2.5">

@@ -11,7 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+
 import { Toaster } from "@/components/ui/sonner";
 import { PocketPal } from "@/components/pocket/pocket-pal";
 import { SiteHeader } from "@/components/pocket/site-header";
@@ -43,9 +43,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+  useEffect(() => {}, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -86,14 +84,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "The Missing Pocket — Find the needs your reviews leave behind" },
+      { title: "SignalScope — Find the needs your reviews leave behind" },
       {
         name: "description",
         content:
           "A consumer-insights studio that turns reviews, questions and surveys into traceable needs, evidence gaps and product experiments.",
       },
-      { property: "og:title", content: "The Missing Pocket" },
-      { property: "og:description", content: "Find the needs your reviews leave behind." },
+      { property: "og:title", content: "SignalScope" },
+      { property: "og:description", content: "Customer evidence. Clearer decisions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -102,13 +100,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap",
       },
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
   shellComponent: RootShell,
@@ -144,13 +142,16 @@ function RootComponent() {
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main" className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 sm:pt-10">
+        <main id="main" className="workspace-main mx-auto max-w-[1600px] px-5 pb-16 pt-8 sm:px-8">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
-        <footer className="border-t-2 border-dashed border-stitch/60">
+        <footer className="workspace-footer border-t-2 border-dashed border-stitch/60">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p>The Missing Pocket · a consumer-insights prototype. The demo backpack is fictional and not affiliated with any university or brand.</p>
+            <p>
+              SignalScope · a consumer-insights prototype. The demo backpack is fictional and not
+              affiliated with any university or brand.
+            </p>
             <p>Synthetic demonstration evidence—not findings about a real product.</p>
           </div>
         </footer>

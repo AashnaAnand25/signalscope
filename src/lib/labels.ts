@@ -96,5 +96,10 @@ export function formatDate(iso?: string) {
   if (!iso) return "Date unavailable";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "Date unavailable";
-  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }

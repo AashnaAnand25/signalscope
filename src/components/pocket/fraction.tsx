@@ -13,14 +13,24 @@ interface Props {
 }
 
 /** Every share shows numerator, denominator and unit. The % is secondary. */
-export function FractionStat({ value, label, showBar = true, tone = "orange", className, size = "md" }: Props) {
+export function FractionStat({
+  value,
+  label,
+  showBar = true,
+  tone = "orange",
+  className,
+  size = "md",
+}: Props) {
   const s = share(value);
   return (
     <div className={cn("space-y-1", className)}>
       <div className="flex items-baseline justify-between gap-3">
         <p className={cn("tabular text-foreground", size === "md" ? "text-sm" : "text-xs")}>
           <span className="font-display text-base font-semibold">{value.numerator}</span>
-          <span className="text-muted-foreground"> / {value.denominator} {value.unit}</span>
+          <span className="text-muted-foreground">
+            {" "}
+            / {value.denominator} {value.unit}
+          </span>
           {label && <span className="text-foreground"> {label}</span>}
         </p>
         <span className="tabular shrink-0 text-xs text-muted-foreground">

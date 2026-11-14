@@ -41,7 +41,10 @@ export function BackpackExplorer() {
                 aria-label={`${h.label}: ${h.description}. Open insights`}
                 className="group relative -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline-offset-4"
               >
-                <span className="absolute inset-0 rounded-full bg-primary/50 animate-pulse-ring" aria-hidden />
+                <span
+                  className="absolute inset-0 rounded-full bg-primary/50 animate-pulse-ring"
+                  aria-hidden
+                />
                 <span className="relative grid size-9 place-items-center rounded-full border-[3px] border-paper bg-navy font-display text-sm font-semibold text-navy-foreground shadow-sticker transition group-hover:scale-110 group-hover:bg-primary">
                   {i + 1}
                 </span>
@@ -84,7 +87,10 @@ export function BackpackExplorer() {
                   {h.desires.map((d) => DESIRE_META[d].label).join(" · ")}
                 </span>
               </span>
-              <ArrowRight className="size-4 shrink-0 text-primary transition group-hover:translate-x-0.5" aria-hidden />
+              <ArrowRight
+                className="size-4 shrink-0 text-primary transition group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </button>
           </li>
         ))}
