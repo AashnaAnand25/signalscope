@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompanyRouteImport } from './routes/company'
+import { Route as CompanySurveyRouteImport } from './routes/company-survey'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as DesiresRouteImport } from './routes/desires'
 import { Route as EvidenceRouteImport } from './routes/evidence'
@@ -20,6 +22,16 @@ import { Route as OpportunitiesRouteImport } from './routes/opportunities'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanySurveyRoute = CompanySurveyRouteImport.update({
+  id: '/company-survey',
+  path: '/company-survey',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataRoute = DataRouteImport.update({
@@ -55,6 +67,8 @@ const OpportunitiesRoute = OpportunitiesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/company': typeof CompanyRoute
+  '/company-survey': typeof CompanySurveyRoute
   '/data': typeof DataRoute
   '/desires': typeof DesiresRoute
   '/evidence': typeof EvidenceRoute
@@ -64,6 +78,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/company': typeof CompanyRoute
+  '/company-survey': typeof CompanySurveyRoute
   '/data': typeof DataRoute
   '/desires': typeof DesiresRoute
   '/evidence': typeof EvidenceRoute
@@ -74,6 +90,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/company': typeof CompanyRoute
+  '/company-survey': typeof CompanySurveyRoute
   '/data': typeof DataRoute
   '/desires': typeof DesiresRoute
   '/evidence': typeof EvidenceRoute
@@ -85,6 +103,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/company'
+    | '/company-survey'
     | '/data'
     | '/desires'
     | '/evidence'
@@ -94,6 +114,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/company'
+    | '/company-survey'
     | '/data'
     | '/desires'
     | '/evidence'
@@ -103,6 +125,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/company'
+    | '/company-survey'
     | '/data'
     | '/desires'
     | '/evidence'
@@ -113,6 +137,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompanyRoute: typeof CompanyRoute
+  CompanySurveyRoute: typeof CompanySurveyRoute
   DataRoute: typeof DataRoute
   DesiresRoute: typeof DesiresRoute
   EvidenceRoute: typeof EvidenceRoute
@@ -128,6 +154,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company': {
+      id: '/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company-survey': {
+      id: '/company-survey'
+      path: '/company-survey'
+      fullPath: '/company-survey'
+      preLoaderRoute: typeof CompanySurveyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data': {
@@ -177,6 +217,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompanyRoute: CompanyRoute,
+  CompanySurveyRoute: CompanySurveyRoute,
   DataRoute: DataRoute,
   DesiresRoute: DesiresRoute,
   EvidenceRoute: EvidenceRoute,

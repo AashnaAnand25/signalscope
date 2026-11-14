@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -131,6 +132,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const companyMode = useRouterState({ select: (s) => s.location.pathname.startsWith("/company") });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -149,10 +151,15 @@ function RootComponent() {
         <footer className="workspace-footer border-t-2 border-dashed border-stitch/60">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <p>
-              SignalScope · a consumer-insights prototype. The demo backpack is fictional and not
-              affiliated with any university or brand.
+              {companyMode
+                ? "SignalScope · company research pilot."
+                : "SignalScope · a consumer-insights prototype. The demo backpack is fictional and not affiliated with any university or brand."}
             </p>
-            <p>Synthetic demonstration evidence—not findings about a real product.</p>
+            <p>
+              {companyMode
+                ? "Company data requires approved sources and a secure deployment."
+                : "Synthetic demonstration evidence—not findings about a real product."}
+            </p>
           </div>
         </footer>
         <Toaster position="bottom-center" />

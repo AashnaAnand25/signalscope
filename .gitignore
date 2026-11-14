@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 .output
+backend/data/
+.env
+.env.*
+!.env.example
+!backend/.env.example
 .vinxi
 .tanstack/**
 .nitro

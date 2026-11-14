@@ -4,6 +4,8 @@ Customer evidence. Clearer decisions.
 
 A corporate consumer-intelligence workspace for the Kearney × PERLab Consumer Insights challenge. Reviews, product questions, discussions, and survey responses connect to customer desires, evidence gaps, and product experiments. The campus backpack is a fictional demonstration product.
 
+The separate [company pilot](docs/COMPANY_SETUP.md) adds shared SQLite data, configurable product variants, cited evidence review, decision records, outcome entry, and a public survey endpoint. It needs a company dataset and deployment decisions before use with real customer information.
+
 ## Local setup
 
 Requires Node 22+ and Bun.

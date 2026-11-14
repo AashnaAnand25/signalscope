@@ -1,5 +1,13 @@
 # SignalScope codebase audit — 2026-11-14
 
+## Company pilot addendum
+
+The audit below describes the original browser-local demo at commit `16060aa`. The `codex/company-workflow` branch now adds an independent Bun/SQLite research API and `/company` plus `/company-survey` routes. The demo routes still use localStorage. The new pilot supports product variants, atomic cited-evidence import, exact-quote human review, counterevidence-linked decisions, outcome entries, and a shared public survey. See [company setup](COMPANY_SETUP.md).
+
+The new service passed a backend workflow test (23 assertions), the existing 12 frontend tests, typecheck, lint with eight existing Fast Refresh warnings, frontend production build, and a separate Bun server bundle. An HTTP smoke test of the two services returned 200 on both routes, accepted a public survey, and returned it from the authenticated reviewer API. Browser automation was unavailable in this session, so the new UI interaction has not been visually exercised.
+
+This remains a **pilot, not a production approval**. Reviewer access is a single shared bearer secret, the survey throttle is global, and no real company data, automated source integrations, model gateway, SSO, backups, retention/deletion policy, experiment assignment, or statistically defensible causal evaluation is connected. The older findings below about absent backend and shared storage apply to the demo routes, not to this independent pilot.
+
 ## Executive summary
 
 SignalScope is a polished, browser-local hackathon prototype, not a production customer-research platform. It has a clear evidence model and careful warnings about synthetic data. The decisive gaps are shared collection, a real and permitted corpus, reviewer identity, and validation of the proposed product change against observed outcomes. This pass fixed the concrete navigation, counting, import, persistence, and large-list defects listed below. The frozen install, tests, typecheck, build, server startup, and guided storyboard browser flow now pass. No production approval is recommended until the shared-data architecture and research validation are completed.

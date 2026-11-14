@@ -29,6 +29,7 @@ export const NAV = [
   { to: "/opportunities", label: "Opportunities" },
   { to: "/feedback", label: "Collect feedback" },
   { to: "/data", label: "Data workspace" },
+  { to: "/company", label: "Company workspace" },
 ] as const;
 
 function ProvenanceBadge() {
@@ -143,6 +144,7 @@ export function SiteHeader() {
   const { product, products, setProductId } = useDemo();
   const [trailOpen, setTrailOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const companyMode = pathname.startsWith("/company");
   const links = NAV.map((n) => (
     <Link
       key={n.to}
@@ -177,9 +179,9 @@ export function SiteHeader() {
           </small>
           <div className="mt-4 border-t border-slate-600 pt-4">
             <small>
-              Research prototype
+              {companyMode ? "Company pilot" : "Research prototype"}
               <br />
-              Local storage · no account required
+              {companyMode ? "Shared API · reviewer access" : "Local storage · no account required"}
             </small>
           </div>
         </div>
@@ -194,29 +196,35 @@ export function SiteHeader() {
           </p>
         </div>
         <div>
-          <Select value={product.id} onValueChange={setProductId}>
-            <SelectTrigger className="h-9 w-52 bg-paper" aria-label="Research product">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {products.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.shortName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <ProvenanceBadge />
-          <Button variant="outline" size="sm" onClick={() => setTrailOpen(true)}>
-            <Compass />
-            Demo guide
-          </Button>
+          {companyMode ? (
+            <span className="text-sm font-semibold">Shared company pilot</span>
+          ) : (
+            <>
+              <Select value={product.id} onValueChange={setProductId}>
+                <SelectTrigger className="h-9 w-52 bg-paper" aria-label="Research product">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.shortName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <ProvenanceBadge />
+              <Button variant="outline" size="sm" onClick={() => setTrailOpen(true)}>
+                <Compass />
+                Demo guide
+              </Button>
+            </>
+          )}
         </div>
       </header>
       <nav className="workspace-mobile-nav" aria-label="Mobile navigation">
         {links}
       </nav>
-      <DemoTrail open={trailOpen} onOpenChange={setTrailOpen} />
+      {!companyMode && <DemoTrail open={trailOpen} onOpenChange={setTrailOpen} />}
     </>
   );
 }
