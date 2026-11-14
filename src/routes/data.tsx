@@ -128,8 +128,9 @@ function DataWorkspace() {
       <section className="workspace-notice">
         <strong>Research boundary</strong>
         <p>
-          The provided example is synthetic. Importing a file does not verify its claims or make
-          AI-suggested tags human-reviewed. Only add data you are allowed to use. No automatic
+          The example is synthetic. For real passages, set origin to collected, supply a sourceUrl
+          or sourceReference, and set codingStatus to human-reviewed or ai-suggested as appropriate.
+          Verify codings against the source. Only add data you are allowed to use. No automatic
           scraping or live AI analysis is connected.
         </p>
       </section>

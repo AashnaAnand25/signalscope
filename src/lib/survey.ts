@@ -116,5 +116,6 @@ export function surveyToEvidence(r: SurveyResponse, product: ProductConfig): Evi
       ? { min: range.min, max: range.max, label: `Would consider ${range.label}` }
       : undefined,
     surveyResponseId: r.id,
+    surveyTopDesire: r.topDesire,
   };
 }

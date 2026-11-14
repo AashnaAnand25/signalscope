@@ -66,6 +66,8 @@ export interface EvidenceRecord {
   sourceType: SourceType;
   text: string;
   sourceUrl?: string | undefined;
+  /** Citation for interviews, support tickets, or other non-URL sources. */
+  sourceReference?: string | undefined;
   /** ISO date, or undefined → "Date unavailable". */
   date?: string | undefined;
   journey?: JourneyContext | undefined;
@@ -84,6 +86,8 @@ export interface EvidenceRecord {
   tone?: "positive" | "mixed" | "negative" | undefined;
   /** Links to the survey response this record was created from. */
   surveyResponseId?: string | undefined;
+  /** Immutable answer, separate from editable reviewer coding. */
+  surveyTopDesire?: DesireId | undefined;
 }
 
 export interface ConflictPair {

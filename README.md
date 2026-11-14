@@ -23,6 +23,11 @@ bun run build
 bun run start
 ```
 
+Alternatively, run `./run.sh` from anywhere. It requires Bun and Node, installs from the frozen
+lockfile, builds, then starts the Nitro server on port 8081 or the next free port. As requested
+for this launcher, it forcibly stops any listener already using port 8081; use it only where
+that behavior is appropriate.
+
 Production output: `.output/` (Nitro Node server). No database or API key is required for the local demo.
 
 ## What works
@@ -31,7 +36,10 @@ Production output: `.output/` (Nitro Node server). No database or API key is req
 - Ten desire categories, source filtering, supporting records, and counterexamples.
 - Journey coverage with measured vs unavailable metrics.
 - Evidence search, reviewer tag edits, and side-by-side conflicts.
-- Opportunities with supporting/contradicting records, bookmarks, and research status.
+- Opportunities with supporting/contradicting records, bookmarks, and research status. Reviewed,
+  collected passages describing an unmet need also produce a traceable draft opportunity.
+- A five-scene guided decision story on Opportunities imports three fictional backpack passages,
+  shows the opposing segments, compares three changes, and ends with a metric and reversal rule.
 - Two-step voluntary survey, actual-use question, validated local persistence, copy link and generated QR.
 - Data workspace with validated JSON imports and evidence/metric exports.
 
@@ -39,7 +47,13 @@ All seeded evidence is synthetic. Survey responses and imports persist only in t
 
 ## Import evidence
 
-Open Data workspace, download its example, replace it with permitted evidence, and import the JSON array. Keep stable unique IDs and the selected product ID. Preserve source/origin/coding classifications. Public source URLs must use HTTPS. Import does not verify claims or grant permission to reuse text. Retain citations and use only permitted sources.
+Open Data workspace, download its synthetic example, replace it with permitted evidence, and
+import the JSON array. Keep stable unique IDs and the selected product ID. For collected passages,
+provide a HTTPS `sourceUrl` or `sourceReference`, set `origin` to `collected`, and use `human-reviewed`
+or `ai-suggested` coding status. General imports cannot manufacture survey responses. Import does
+not verify claims or grant permission to reuse text. Retain citations and use only permitted sources.
+
+See [the codebase audit](docs/CODEBASE_AUDIT.md) for the current risks and validation limits.
 
 ## Teammate work
 

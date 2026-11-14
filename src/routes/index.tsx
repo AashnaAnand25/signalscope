@@ -10,7 +10,7 @@ import { HowToRead, SyntheticNotice } from "@/components/pocket/page-intro";
 import { PocketPal } from "@/components/pocket/pocket-pal";
 import { useDemo } from "@/lib/demo-store";
 import { DESIRE_META } from "@/lib/labels";
-import { allDesireStats, rankOpportunities, summarize } from "@/lib/metrics";
+import { allDesireStats, derivedOpportunities, rankOpportunities, summarize } from "@/lib/metrics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,7 +46,10 @@ function Overview() {
     .sort((a, b) => b.mentions - a.mentions)
     .slice(0, 5);
   const byId = new Map(records.map((r) => [r.id, r]));
-  const leading = rankOpportunities(product.opportunities, records).slice(0, 3);
+  const leading = rankOpportunities(
+    [...product.opportunities, ...derivedOpportunities(records)],
+    records,
+  ).slice(0, 3);
   const unanswered = records.filter((r) => r.sourceType === "qa" && r.answered === false);
 
   return (

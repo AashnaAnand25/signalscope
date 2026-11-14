@@ -138,8 +138,12 @@ export function EvidenceCard({
           >
             Source <ExternalLink className="size-3" />
           </a>
+        ) : record.sourceReference ? (
+          <span>Source: {record.sourceReference}</span>
         ) : (
-          <span>No source URL (synthetic)</span>
+          <span>
+            {record.origin === "synthetic-seed" ? "Synthetic example" : "Source unavailable"}
+          </span>
         )}
         {onEditTags && (
           <Button
