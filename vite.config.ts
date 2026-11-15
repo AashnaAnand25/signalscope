@@ -7,7 +7,12 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     tanstackStart({ server: { entry: "server" } }),
-    nitro({ preset: "node-server" }),
+    nitro({
+      preset: process.env["VERCEL"] ? "vercel" : "node-server",
+      vercel: {
+        functions: { maxDuration: Number(process.env["VERCEL_FUNCTION_MAX_DURATION"] || 300) },
+      },
+    }),
     react(),
   ],
   resolve: { tsconfigPaths: true, dedupe: ["react", "react-dom", "@tanstack/react-query"] },
