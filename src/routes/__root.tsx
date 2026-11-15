@@ -1,3 +1,4 @@
+import { WorkspaceNavigation } from "@/components/workspace-navigation";
 import { MetricGuide } from "@/components/metric-guide";
 import { AccessibilityProvider, AccessibilitySettings } from "@/components/accessibility";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -134,6 +135,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isHome = useRouterState({ select: (s) => s.location.pathname === "/" });
   const companyMode = useRouterState({ select: (s) => s.location.pathname.startsWith("/company") });
 
   return (
@@ -147,10 +149,16 @@ function RootComponent() {
             Skip to content
           </a>
           <SiteHeader />
-          <main id="main" className="workspace-main mx-auto max-w-[1600px] px-5 pb-16 pt-8 sm:px-8">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </main>
+          <div className={isHome ? "" : "restored-layout"}>
+            {!isHome && <WorkspaceNavigation />}
+            <main
+              id="main"
+              className="workspace-main mx-auto max-w-[1600px] px-5 pb-16 pt-8 sm:px-8"
+            >
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </main>
+          </div>
           <footer className="workspace-footer border-t-2 border-dashed border-stitch/60">
             <div className="footer-controls">
               <div>

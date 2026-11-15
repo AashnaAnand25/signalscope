@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import { useDemo } from "@/lib/demo-store";
+import { campusBackpack } from "@/data/campus-backpack";
 import { ArrowUpRight, Activity } from "lucide-react";
 export const NAV = [
   { to: "/", label: "Home" },
@@ -6,6 +8,7 @@ export const NAV = [
   { to: "/data", label: "Data & sources" },
 ] as const;
 export function SiteHeader() {
+  const { setProductId } = useDemo();
   return (
     <header className="scope-header">
       <Link to="/" className="scope-brand">
@@ -29,7 +32,7 @@ export function SiteHeader() {
           </div>
         </details>
       </nav>
-      <Link to="/kearney" className="scope-cta">
+      <Link to="/analytics" onClick={() => setProductId(campusBackpack.id)} className="scope-cta">
         Try now
         <ArrowUpRight size={16} />
       </Link>

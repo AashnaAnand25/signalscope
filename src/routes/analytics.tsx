@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, Database, MessagesSquare, ScanSearch, ShieldQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ResearchAgent } from "@/components/research-agent";
 import { OpportunityDialog } from "@/components/pocket/opportunity";
 import { BackpackExplorer } from "@/components/pocket/backpack-explorer";
 import { useDemo } from "@/lib/demo-store";
@@ -62,6 +63,11 @@ function Overview() {
             Import evidence <ArrowRight size={15} />
           </Link>
         </Button>
+      </div>
+      <div className="scope-strip">
+        <strong>Backpack demo and product analysis</strong>
+        <span>Seeded records are fictional examples, not scraped reviews.</span>
+        <Link to="/kearney">Open Kearney portfolio →</Link>
       </div>
       <div className="getting-started">
         <strong>New here?</strong>
@@ -219,7 +225,12 @@ function Overview() {
           <p className="chart-note">No opportunities supported by the current filter.</p>
         )}
       </section>
-      <details className="product-details">
+      <section aria-label="Comment analysis">
+        <h2>Comment Analysis</h2>
+        <p>Analyze a permitted passage with Groq, then review its tags before saving.</p>
+        <ResearchAgent />
+      </section>
+      <details className="product-details" open>
         <summary>Explore demo product & methodology</summary>
         <div className="product-detail-grid">
           <BackpackExplorer />

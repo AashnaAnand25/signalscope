@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, ArrowRight, Fingerprint, GitCompareArrows, Layers3 } from "lucide-react";
+import { useDemo } from "@/lib/demo-store";
+import { campusBackpack } from "@/data/campus-backpack";
 import { SignalSculpture } from "@/components/signal-sculpture";
 export const Route = createFileRoute("/")({ component: Home });
 function Home() {
+  const { setProductId } = useDemo();
   return (
     <div className="scope-landing">
       <section className="scope-hero">
@@ -19,11 +22,18 @@ function Home() {
             Go beyond the star rating. Connect what customers want, why they buy, and what they wish
             worked differently.
           </p>
-          <Link to="/kearney" className="scope-cta hero-cta">
+          <Link
+            to="/analytics"
+            onClick={() => setProductId(campusBackpack.id)}
+            className="scope-cta hero-cta"
+          >
             Try now
             <ArrowUpRight size={20} />
           </Link>
-          <small>No account needed. Every finding leads back to its evidence.</small>
+          <small>No account needed. Start with the clearly labeled Backpack demo.</small>
+          <Link to="/kearney" className="landing-secondary">
+            Explore Kearney products →
+          </Link>
         </div>
         <SignalSculpture />
       </section>
