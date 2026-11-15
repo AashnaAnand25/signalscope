@@ -97,3 +97,34 @@ it("excludes synthetic records from evidence questions unless explicitly enabled
   expect(screen.getByText("32 records will be sent")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Run research" })).toBeEnabled();
 });
+
+it("works locally without a configured API and saves only explicitly reviewed source tags", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi
+      .fn()
+      .mockResolvedValue(
+        Response.json({ configured: false, provider: "gemini", model: "unavailable" }),
+      ),
+  );
+  render(
+    <DemoStoreProvider>
+      <ResearchAgent />
+      <Counts />
+    </DemoStoreProvider>,
+  );
+  fireEvent.change(screen.getByLabelText("Original passage"), {
+    target: { value: "I need waterproof fabric." },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Analyze locally (no key needed)" }));
+  expect(screen.getByText(/Local keyword analysis. No API call/)).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Source reference, if no URL"), {
+    target: { value: "Synthetic test only" },
+  });
+  fireEvent.click(screen.getAllByRole("checkbox")[0]!);
+  fireEvent.click(screen.getByRole("button", { name: "Add passage with 1 selected tags" }));
+  await waitFor(() => expect(screen.getByTestId("collected-count")).toHaveTextContent("1"));
+  expect(localStorage.getItem("the-missing-pocket:v1")).toContain(
+    "Local keyword suggestions explicitly selected",
+  );
+});

@@ -1,3 +1,4 @@
+import { localExtraction, localEvidenceLookup } from "@/lib/local-research";
 import { useEffect, useState } from "react";
 import { Sparkles, Search, FileText, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
@@ -51,7 +52,7 @@ export function ResearchAgent() {
     try {
       const response = await fetch("/api/research", {
         method: "POST",
-        signal: AbortSignal.timeout(130000),
+        signal: AbortSignal.timeout(20000),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode,
@@ -72,7 +73,7 @@ export function ResearchAgent() {
     } catch (e) {
       setNotice(
         e instanceof Error && ["TimeoutError", "AbortError"].includes(e.name)
-          ? "The request took longer than 50 seconds. Nothing was saved. Try again; if it repeats, check the server network connection."
+          ? "The request took longer than 20 seconds. Nothing was saved. Try again; if it repeats, check the server network connection."
           : e instanceof Error
             ? e.message
             : "Request failed.",
@@ -80,6 +81,21 @@ export function ResearchAgent() {
     } finally {
       setBusy(false);
     }
+  }
+  function runLocal() {
+    setSelected([]);
+    setAnswer(
+      mode === "extract"
+        ? { ...localExtraction(text), provider: "local-rules", model: "keyword-rules-v1" }
+        : {
+            text: localEvidenceLookup(text, scope),
+            provider: "local-rules",
+            model: "keyword-lookup-v1",
+          },
+    );
+    setNotice(
+      "Local keyword analysis. No API call, web search or LLM inference. Review every suggested tag against its exact quote before saving.",
+    );
   }
   function save() {
     if (!answer?.suggestions || !selected.length) return;
@@ -94,10 +110,18 @@ export function ResearchAgent() {
           sourceType,
           text,
           ...(sourceUrl.trim() ? { sourceUrl: sourceUrl.trim() } : {}),
-          ...(sourceReference.trim() ? { sourceReference: sourceReference.trim() } : {}),
+          ...(sourceReference.trim() || answer.provider === "local-rules"
+            ? {
+                sourceReference:
+                  `${sourceReference.trim()}${answer.provider === "local-rules" ? " | Local keyword suggestions explicitly selected by reviewer" : ""}`.slice(
+                    0,
+                    500,
+                  ),
+              }
+            : {}),
           codings,
           ...(answer.tone ? { tone: answer.tone } : {}),
-          codingStatus: "ai-suggested",
+          codingStatus: answer.provider === "local-rules" ? "human-reviewed" : "ai-suggested",
           classification: "self-reported",
           origin: "collected",
         },
@@ -106,7 +130,9 @@ export function ResearchAgent() {
       setText("");
       setSelected([]);
       setNotice(
-        "Evidence added. Metrics updated. Tags remain labeled AI-suggested until separately reviewed.",
+        answer.provider === "local-rules"
+          ? "Evidence saved with your selected rule-based tags. Metrics updated."
+          : "Evidence added. Metrics updated. Tags remain labeled AI-suggested until separately reviewed.",
       );
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Could not save evidence.");
@@ -134,8 +160,8 @@ export function ResearchAgent() {
       </div>
       {!status?.configured && (
         <p className="workspace-notice text-sm">
-          Add <code>GEMINI_API_KEY</code> to the server's <code>.env</code>, then restart. Choose
-          Google AI Studio or Vertex express mode. Keys never go in this form.
+          Cloud AI is unavailable. Use local keyword analysis below, or configure OpenAI, Anthropic
+          or Gemini on the server. Keys never go in this form.
         </p>
       )}
       <div className="source-tabs" role="group" aria-label="Research mode">
@@ -164,7 +190,7 @@ export function ResearchAgent() {
       </div>
       <p className="text-sm text-muted-foreground">
         {mode === "extract"
-          ? "Paste a permitted customer passage or a quoted excerpt from a Velocity export. Gemini suggests need tags; you decide what enters the dataset."
+          ? "Paste a permitted customer passage or a quoted excerpt from a Velocity export. The configured model suggests need tags; you decide what enters the dataset."
           : mode === "ask"
             ? "Ask a question about your collected records. The assistant receives the first 40 eligible records, up to 3,000 characters each."
             : "Find current public sources with Google Search. Results are research leads, not verified customer records. Search may incur provider charges."}
@@ -242,8 +268,8 @@ export function ResearchAgent() {
         </label>
       )}
       <p className="text-xs text-muted-foreground">
-        Running sends the supplied text to Google. Use permitted, non-sensitive research only.
-        Nothing is automatically imported.
+        Cloud analysis sends text to the configured provider. Local keyword analysis stays in this
+        browser. Use permitted, non-sensitive research only. Nothing is automatically imported.
       </p>
       <Button
         disabled={
@@ -252,11 +278,22 @@ export function ResearchAgent() {
         onClick={run}
       >
         {busy
-          ? "Researching (up to 50 seconds)…"
+          ? "Researching (up to 20 seconds)…"
           : mode === "extract"
             ? "Suggest need tags"
             : "Run research"}
       </Button>
+      {mode !== "search" && (
+        <Button
+          variant="outline"
+          disabled={busy || text.trim().length < 3 || (mode === "ask" && !scope.length)}
+          onClick={runLocal}
+        >
+          {mode === "extract"
+            ? "Analyze locally (no key needed)"
+            : "Find matching evidence locally"}
+        </Button>
+      )}
       {notice && (
         <p role="status" className="workspace-notice text-sm">
           {notice}
@@ -297,7 +334,10 @@ export function ResearchAgent() {
       )}
       {answer?.text && (
         <div className="rounded-lg border p-4">
-          <p className="text-xs font-semibold mb-3">AI DRAFT · {answer.model}</p>
+          <p className="text-xs font-semibold mb-3">
+            {answer.provider === "local-rules" ? "LOCAL KEYWORD ANALYSIS" : "AI DRAFT"} ·{" "}
+            {answer.model}
+          </p>
           <div className="agent-output">{answer.text}</div>
           {mode === "search" && (
             <p className="text-xs mt-3">

@@ -77,10 +77,32 @@ function json(value: unknown, status = 200) {
   return Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
 }
 export async function handleResearch(request: Request): Promise<Response> {
-  const key = process.env["GEMINI_API_KEY"] || process.env["GOOGLE_API_KEY"];
-  const provider = process.env["GOOGLE_GENAI_PROVIDER"] === "vertex" ? "vertex" : "gemini";
+  const selectedProvider =
+    process.env["AGENT_TAGGING_PROVIDER"] || process.env["AGENT_PROVIDER"] || "gemini";
+  const key =
+    selectedProvider === "groq"
+      ? process.env["GROQ_API_KEY"]
+      : selectedProvider === "openai"
+        ? process.env["OPENAI_API_KEY"]
+        : selectedProvider === "anthropic"
+          ? process.env["ANTHROPIC_API_KEY"]
+          : selectedProvider === "perplexity"
+            ? process.env["PERPLEXITY_API_KEY"]
+            : process.env["GEMINI_API_KEY"] || process.env["GOOGLE_API_KEY"];
+  const provider =
+    selectedProvider === "gemini" && process.env["GOOGLE_GENAI_PROVIDER"] === "vertex"
+      ? "vertex"
+      : selectedProvider;
   const model =
-    process.env["GEMINI_FAST_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-2.5-flash";
+    selectedProvider === "groq"
+      ? process.env["GROQ_MODEL"] || "openai/gpt-oss-20b"
+      : selectedProvider === "openai"
+        ? process.env["OPENAI_MODEL"] || "gpt-4.1-mini"
+        : selectedProvider === "anthropic"
+          ? process.env["ANTHROPIC_MODEL"] || "configured-model"
+          : selectedProvider === "perplexity"
+            ? process.env["PERPLEXITY_MODEL"] || "configured-model"
+            : process.env["GEMINI_FAST_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-2.5-flash";
   const host = new URL(request.url).hostname;
   const local = ["127.0.0.1", "localhost", "::1", "[::1]"].includes(host);
   const enabled = local || process.env["RESEARCH_AGENT_ENABLED"] === "true";
@@ -100,12 +122,11 @@ export async function handleResearch(request: Request): Promise<Response> {
   if (!key)
     return json(
       {
-        error:
-          "Add GEMINI_API_KEY to the server environment, then restart. No AI request was sent.",
+        error: `Add ${selectedProvider.toUpperCase()}_API_KEY to the server environment, then redeploy. Local keyword analysis needs no key.`,
       },
       503,
     );
-  if (!/^[a-zA-Z0-9.-]+$/.test(model))
+  if (!/^[a-zA-Z0-9./_-]+$/.test(model))
     return json({ error: "Invalid server model configuration" }, 503);
   const origin = request.headers.get("origin");
   if ((origin && origin !== new URL(request.url).origin) || (!origin && !local))

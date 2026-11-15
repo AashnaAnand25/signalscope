@@ -79,7 +79,7 @@ export class OpenAIProvider implements AgentProvider {
         "This OpenAI adapter does not supply live search. Set AGENT_SEARCH_PROVIDER=gemini.",
       );
     const key = process.env["OPENAI_API_KEY"],
-      model = process.env["OPENAI_MODEL"];
+      model = process.env["OPENAI_MODEL"] || "gpt-4.1-mini";
     if (!key || !model) throw new Error("OpenAI routing requires OPENAI_API_KEY and OPENAI_MODEL.");
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -92,7 +92,7 @@ export class OpenAIProvider implements AgentProvider {
         ],
         ...(json ? { response_format: { type: "json_object" } } : {}),
       }),
-      signal: AbortSignal.timeout(55000),
+      signal: AbortSignal.timeout(18000),
     });
     if (!r.ok)
       throw new Error(`OpenAI returned HTTP ${r.status}. Check server model access and quota.`);
@@ -109,6 +109,7 @@ export function agentProvider(task: AgentTask): AgentProvider {
     "gemini";
   if (selected === "serper" && task === "search") return new SerperProvider();
   if (selected === "gemini") return new GeminiProvider();
+  if (selected === "groq") return new GroqProvider();
   if (selected === "openai") return new OpenAIProvider();
   if (selected === "anthropic") return new AnthropicProvider();
   if (selected === "perplexity") return new PerplexityProvider();
@@ -216,7 +217,7 @@ export class AnthropicProvider implements AgentProvider {
           { role: "user", content: prompt + (json ? "\nReturn one JSON object only." : "") },
         ],
       }),
-      signal: AbortSignal.timeout(55000),
+      signal: AbortSignal.timeout(18000),
     });
     if (!r.ok)
       throw Object.assign(new Error("Anthropic provider rejected request"), { status: r.status });
@@ -245,7 +246,7 @@ export class PerplexityProvider implements AgentProvider {
         input: prompt + (json ? "\nReturn one JSON object only." : ""),
         ...(task === "search" ? { tools: [{ type: "web_search" }] } : {}),
       }),
-      signal: AbortSignal.timeout(55000),
+      signal: AbortSignal.timeout(18000),
     });
     if (!r.ok)
       throw Object.assign(new Error("Perplexity provider rejected request"), { status: r.status });
@@ -262,5 +263,41 @@ export class PerplexityProvider implements AgentProvider {
     );
     if (!text) throw new Error("Perplexity returned no usable answer.");
     return { text, sources, model, provider: this.name };
+  }
+}
+
+/** Groq's OpenAI-compatible API. Free-plan quotas are enforced by Groq. */
+export class GroqProvider implements AgentProvider {
+  readonly name = "groq";
+  async generate(task: AgentTask, prompt: string, json = false): Promise<AgentOutput> {
+    const key = process.env["GROQ_API_KEY"];
+    if (!key)
+      throw new Error("GROQ_API_KEY is missing. Add a free-plan key from console.groq.com/keys.");
+    if (task === "search")
+      throw new Error(
+        "Groq text inference does not provide verified web search in this adapter. Use an authorized excerpt or configure a separate search provider.",
+      );
+    const model = process.env["GROQ_MODEL"] || "openai/gpt-oss-20b";
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: instruction },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.1,
+        max_completion_tokens: 2048,
+        ...(model.includes("gpt-oss") ? { reasoning_effort: "low" } : {}),
+        ...(json ? { response_format: { type: "json_object" } } : {}),
+      }),
+      signal: AbortSignal.timeout(18000),
+    });
+    if (!r.ok) throw new Error(publicAgentError({ status: r.status }));
+    const data = await r.json();
+    const text = data.choices?.[0]?.message?.content;
+    if (typeof text !== "string" || !text) throw new Error("Groq returned no usable answer.");
+    return { text, sources: [], model, provider: this.name };
   }
 }

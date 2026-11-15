@@ -297,6 +297,7 @@ export async function handlePortfolio(request: Request) {
     if (!(
       process.env["GEMINI_API_KEY"] ||
       process.env["GOOGLE_API_KEY"] ||
+      process.env["GROQ_API_KEY"] ||
       process.env["OPENAI_API_KEY"] ||
       process.env["ANTHROPIC_API_KEY"] ||
       process.env["PERPLEXITY_API_KEY"]
