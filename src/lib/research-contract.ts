@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { codingSchema } from "./validation";
 export const suggestionSchema = codingSchema.extend({ quote: z.string().min(3).max(2000) });
-export const extractionSchema = z.object({ suggestions: z.array(suggestionSchema).max(10) });
+export const extractionSchema = z.object({
+  tone: z.enum(["positive", "mixed", "negative"]).optional(),
+  suggestions: z.array(suggestionSchema).max(10),
+});
 export type Extraction = z.infer<typeof extractionSchema>;
 export function validateExtraction(value: unknown, passage: string): Extraction {
   const result = extractionSchema.parse(value);

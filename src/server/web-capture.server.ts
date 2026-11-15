@@ -131,6 +131,47 @@ export async function capturePublicPage(raw: string) {
       throw new Error(
         "Automated access is disallowed or robots.txt could not be verified. Use a permitted manual excerpt.",
       );
+    if (process.env["SCRAPE_PROVIDER"] === "firecrawl") {
+      const key = process.env["FIRECRAWL_API_KEY"];
+      if (!key)
+        throw new Error(
+          "FIRECRAWL_API_KEY is missing. Use native capture or configure the server key.",
+        );
+      const result = await fetch("https://api.firecrawl.dev/v2/scrape", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: current.href,
+          formats: ["markdown"],
+          onlyMainContent: true,
+          timeout: 20000,
+        }),
+        signal: AbortSignal.timeout(25000),
+      });
+      if (!result.ok)
+        throw new Error(`Firecrawl returned HTTP ${result.status}. No source was saved.`);
+      const output = await result.json();
+      const text = output.data?.markdown;
+      if (
+        typeof text !== "string" ||
+        text.length < 100 ||
+        /just a moment|verify you are human|access denied/i.test(text.slice(0, 250))
+      )
+        throw new Error("No permitted readable content returned. Use an authorized export.");
+      const finalUrl = publicUrl(output.data?.metadata?.sourceURL || current.href);
+      if (finalUrl.hostname !== current.hostname)
+        throw new Error(
+          "Rendered source redirected to another host. Supply the final public URL instead.",
+        );
+      return {
+        title: String(output.data?.metadata?.title || current.hostname).slice(0, 250),
+        text: text.slice(0, 18000),
+        truncated: text.length > 18000,
+        url: finalUrl.href,
+        capturedAt: new Date().toISOString(),
+        method: "public-html" as const,
+      };
+    }
     const page = await download(current);
     if ([301, 302, 303, 307, 308].includes(page.status) && page.location) {
       current = publicUrl(new URL(page.location, current).href);

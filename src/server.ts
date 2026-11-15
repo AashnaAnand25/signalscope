@@ -1,4 +1,5 @@
 import "./lib/error-capture";
+import { handlePortfolio } from "./server/agents/portfolio.server";
 import { handleCapture } from "./server/web-capture.server";
 import { handleResearch } from "./server/research-agent.server";
 
@@ -52,6 +53,7 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      if (new URL(request.url).pathname === "/api/portfolio") return await handlePortfolio(request);
       if (new URL(request.url).pathname === "/api/capture") return await handleCapture(request);
       if (new URL(request.url).pathname === "/api/research") return await handleResearch(request);
       const handler = await getServerEntry();

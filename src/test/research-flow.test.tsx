@@ -8,7 +8,21 @@ function Counts() {
     <p data-testid="collected-count">{records.filter((r) => r.origin === "collected").length}</p>
   );
 }
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem(
+    "the-missing-pocket:v1",
+    JSON.stringify({
+      productId: "campus-everyday-backpack",
+      responses: [],
+      externalRecords: [],
+      tagOverrides: {},
+      opportunityStatus: {},
+      bookmarks: [],
+      trail: {},
+    }),
+  );
+});
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();

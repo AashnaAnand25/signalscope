@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 import { PocketPal } from "./pocket-pal";
 
 export const NAV = [
-  { to: "/", label: "Overview" },
+  { to: "/", label: "Product renewal" },
   { to: "/desires", label: "Customer desires" },
   { to: "/journey", label: "Journey & coverage" },
   { to: "/evidence", label: "Evidence library" },
@@ -46,7 +46,8 @@ export const NAV = [
   { to: "/feedback", label: "Collect feedback" },
   { to: "/data", label: "Data workspace" },
   { to: "/company", label: "Company workspace" },
-  { to: "/research", label: "PERLab research" },
+  { to: "/kearney", label: "Kearney portfolio" },
+  { to: "/analytics", label: "Evidence analytics" },
 ] as const;
 
 function ProvenanceBadge() {
@@ -188,11 +189,12 @@ export function SiteHeader() {
     Settings,
     Building2,
     ScanSearch,
+    LayoutDashboard,
   ];
   const [trailOpen, setTrailOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const companyMode = pathname.startsWith("/company");
-  const researchMode = pathname === "/research";
+  const researchMode = pathname === "/kearney" || pathname === "/";
   const links = NAV.map((n, i) => (
     <Link
       key={n.to}
@@ -261,7 +263,7 @@ export function SiteHeader() {
         </div>
         <div>
           {researchMode ? (
-            <span className="text-sm font-semibold">Public sources · Local research brief</span>
+            <span className="text-sm font-semibold">Voice of customer · Product renewal</span>
           ) : companyMode ? (
             <span className="text-sm font-semibold">Shared company pilot</span>
           ) : (

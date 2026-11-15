@@ -1456,3 +1456,178 @@ html[data-motion="reduced"] *::after {
   max-height: calc(100dvh - 300px);
   overflow-y: auto;
 }
+.renewal-hero {
+  background: linear-gradient(125deg, #13283f, #183b49);
+  color: #f3f7fd;
+  padding: clamp(24px, 4vw, 48px);
+  border-radius: 18px;
+}
+.renewal-hero h1 {
+  max-width: 800px;
+  font-size: clamp(28px, 3.3vw, 45px);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin: 16px 0;
+}
+.renewal-hero > p {
+  color: #c8d8e8;
+  font-size: 16px;
+}
+.renewal-hero .section-kicker,
+.renewal-hero .source-reference a,
+.renewal-hero .source-reference small {
+  color: #a9eadd;
+}
+.renewal-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 26px 0;
+  font-size: 12px;
+}
+.renewal-steps > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.renewal-steps b {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #73bbaf;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.portfolio-selector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.portfolio-selector button {
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  padding: 16px;
+  border-radius: 12px;
+}
+.portfolio-selector button[aria-pressed="true"] {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+  background: var(--primary-soft);
+}
+.portfolio-selector strong {
+  display: block;
+  font-size: 15px;
+}
+.portfolio-selector small {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  margin-top: 5px;
+}
+.portfolio-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.portfolio-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 13px 18px;
+  font-weight: 650;
+  font-size: 13px;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+.portfolio-tabs button[aria-selected="true"] {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.source-reference {
+  margin-top: 7px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+.source-reference a {
+  color: var(--primary);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  text-decoration: underline;
+}
+.source-reference .source-url {
+  display: block;
+  width: 100%;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.source-reference small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+}
+.research-run {
+  padding: 15px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  font-size: 13px;
+}
+.research-run small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted-foreground);
+}
+.research-run p {
+  margin-top: 7px;
+  font-size: 12px;
+}
+.coverage-bars > div {
+  display: grid;
+  grid-template-columns: 180px 1fr 35px;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 12px;
+  align-items: center;
+}
+.coverage-bars > div > div {
+  grid-column: 1/-1;
+}
+.coverage-bars span,
+.sentiment-bars > div > div {
+  height: 9px;
+  background: var(--muted);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.coverage-bars i,
+.sentiment-bars i {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+}
+.sentiment-bars > div {
+  display: grid;
+  grid-template-columns: 85px 1fr 70px;
+  gap: 12px;
+  margin: 18px 0;
+  align-items: center;
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .portfolio-selector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .coverage-bars > div {
+    grid-template-columns: 110px 1fr 35px;
+  }
+  .renewal-steps {
+    gap: 12px;
+  }
+}

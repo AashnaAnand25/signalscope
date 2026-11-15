@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as CompanySurveyRouteImport } from './routes/company-survey'
 import { Route as DataRouteImport } from './routes/data'
@@ -17,12 +18,18 @@ import { Route as DesiresRouteImport } from './routes/desires'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as JourneyRouteImport } from './routes/journey'
+import { Route as KearneyRouteImport } from './routes/kearney'
 import { Route as OpportunitiesRouteImport } from './routes/opportunities'
 import { Route as ResearchRouteImport } from './routes/research'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompanyRoute = CompanyRouteImport.update({
@@ -60,6 +67,11 @@ const JourneyRoute = JourneyRouteImport.update({
   path: '/journey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KearneyRoute = KearneyRouteImport.update({
+  id: '/kearney',
+  path: '/kearney',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OpportunitiesRoute = OpportunitiesRouteImport.update({
   id: '/opportunities',
   path: '/opportunities',
@@ -73,6 +85,7 @@ const ResearchRoute = ResearchRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/company': typeof CompanyRoute
   '/company-survey': typeof CompanySurveyRoute
   '/data': typeof DataRoute
@@ -80,11 +93,13 @@ export interface FileRoutesByFullPath {
   '/evidence': typeof EvidenceRoute
   '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
+  '/kearney': typeof KearneyRoute
   '/opportunities': typeof OpportunitiesRoute
   '/research': typeof ResearchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/company': typeof CompanyRoute
   '/company-survey': typeof CompanySurveyRoute
   '/data': typeof DataRoute
@@ -92,12 +107,14 @@ export interface FileRoutesByTo {
   '/evidence': typeof EvidenceRoute
   '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
+  '/kearney': typeof KearneyRoute
   '/opportunities': typeof OpportunitiesRoute
   '/research': typeof ResearchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/company': typeof CompanyRoute
   '/company-survey': typeof CompanySurveyRoute
   '/data': typeof DataRoute
@@ -105,6 +122,7 @@ export interface FileRoutesById {
   '/evidence': typeof EvidenceRoute
   '/feedback': typeof FeedbackRoute
   '/journey': typeof JourneyRoute
+  '/kearney': typeof KearneyRoute
   '/opportunities': typeof OpportunitiesRoute
   '/research': typeof ResearchRoute
 }
@@ -112,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analytics'
     | '/company'
     | '/company-survey'
     | '/data'
@@ -119,11 +138,13 @@ export interface FileRouteTypes {
     | '/evidence'
     | '/feedback'
     | '/journey'
+    | '/kearney'
     | '/opportunities'
     | '/research'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analytics'
     | '/company'
     | '/company-survey'
     | '/data'
@@ -131,11 +152,13 @@ export interface FileRouteTypes {
     | '/evidence'
     | '/feedback'
     | '/journey'
+    | '/kearney'
     | '/opportunities'
     | '/research'
   id:
     | '__root__'
     | '/'
+    | '/analytics'
     | '/company'
     | '/company-survey'
     | '/data'
@@ -143,12 +166,14 @@ export interface FileRouteTypes {
     | '/evidence'
     | '/feedback'
     | '/journey'
+    | '/kearney'
     | '/opportunities'
     | '/research'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   CompanyRoute: typeof CompanyRoute
   CompanySurveyRoute: typeof CompanySurveyRoute
   DataRoute: typeof DataRoute
@@ -156,6 +181,7 @@ export interface RootRouteChildren {
   EvidenceRoute: typeof EvidenceRoute
   FeedbackRoute: typeof FeedbackRoute
   JourneyRoute: typeof JourneyRoute
+  KearneyRoute: typeof KearneyRoute
   OpportunitiesRoute: typeof OpportunitiesRoute
   ResearchRoute: typeof ResearchRoute
 }
@@ -167,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/company': {
@@ -218,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JourneyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kearney': {
+      id: '/kearney'
+      path: '/kearney'
+      fullPath: '/kearney'
+      preLoaderRoute: typeof KearneyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/opportunities': {
       id: '/opportunities'
       path: '/opportunities'
@@ -237,6 +277,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
   CompanyRoute: CompanyRoute,
   CompanySurveyRoute: CompanySurveyRoute,
   DataRoute: DataRoute,
@@ -244,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   EvidenceRoute: EvidenceRoute,
   FeedbackRoute: FeedbackRoute,
   JourneyRoute: JourneyRoute,
+  KearneyRoute: KearneyRoute,
   OpportunitiesRoute: OpportunitiesRoute,
   ResearchRoute: ResearchRoute,
 }

@@ -7,6 +7,7 @@ import { SOURCE_LABEL } from "@/lib/labels";
 import type { SourceType } from "@/lib/types";
 
 type Answer = {
+  tone?: "positive" | "mixed" | "negative" | undefined;
   text?: string;
   suggestions?: Extraction["suggestions"];
   sources?: { url: string; title: string }[];
@@ -95,6 +96,7 @@ export function ResearchAgent() {
           ...(sourceUrl.trim() ? { sourceUrl: sourceUrl.trim() } : {}),
           ...(sourceReference.trim() ? { sourceReference: sourceReference.trim() } : {}),
           codings,
+          ...(answer.tone ? { tone: answer.tone } : {}),
           codingStatus: "ai-suggested",
           classification: "self-reported",
           origin: "collected",
