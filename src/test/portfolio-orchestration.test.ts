@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({ generate: vi.fn(), capture: vi.fn() }));
 vi.mock("@/server/agents/provider.server", () => ({
   agentProvider: () => ({ generate: mocks.generate }),
   parseAgentJson: JSON.parse,
+  publicAgentError: (e: Error) => e.message,
 }));
 vi.mock("@/server/web-capture.server", () => ({
   capturePublicPage: mocks.capture,
@@ -141,4 +142,43 @@ describe("Automatic product research", () => {
       ).status,
     ).toBe(403);
   });
+});
+
+it("retains a labeled seed description when capture and providers both fail", async () => {
+  vi.stubEnv("GEMINI_API_KEY", "test-only");
+  vi.stubEnv("VERCEL", "1");
+  mocks.capture.mockRejectedValue(new Error("getaddrinfo ENOTFOUND"));
+  mocks.generate.mockRejectedValue(new Error("MODEL_UNAVAILABLE: test provider"));
+  const response = await handlePortfolio(
+    new Request("http://localhost:8081/api/portfolio", {
+      method: "POST",
+      headers: { Origin: "http://localhost:8081" },
+      body: JSON.stringify({ productId: "ingredient-compass", refresh: true }),
+    }),
+  );
+  const job = await response.json();
+  expect(job.status).toBe("failed");
+  expect(job.description.mode).toBe("seed-demo");
+  expect(job.description.text.length).toBeGreaterThan(50);
+  expect(job.records).toEqual([]);
+  expect(job.documents[0].note).toContain("ENOTFOUND");
+});
+it("uses an authorized excerpt after a failed live capture, without inventing customer feedback", async () => {
+  vi.stubEnv("GEMINI_API_KEY", "test-only");
+  vi.stubEnv("VERCEL", "1");
+  mocks.capture.mockRejectedValue(new Error("Source blocked"));
+  mocks.generate.mockRejectedValue(new Error("REQUEST_TIMEOUT: test provider"));
+  const excerpt = "Authorized test-only product description. ".repeat(4);
+  const response = await handlePortfolio(
+    new Request("http://localhost:8081/api/portfolio", {
+      method: "POST",
+      headers: { Origin: "http://localhost:8081" },
+      body: JSON.stringify({ productId: "tariff-simulator", refresh: true, excerpt }),
+    }),
+  );
+  const job = await response.json();
+  expect(job.description.mode).toBe("authorized-excerpt");
+  expect(job.description.text).toBe(excerpt);
+  expect(job.documents[0].kind).toBe("provider-claim");
+  expect(job.records).toEqual([]);
 });

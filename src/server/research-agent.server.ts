@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { agentProvider } from "./agents/provider.server";
+import { agentProvider, publicAgentError } from "./agents/provider.server";
 import {
   validateComparison,
   competitorInputSchema,
@@ -79,7 +79,8 @@ function json(value: unknown, status = 200) {
 export async function handleResearch(request: Request): Promise<Response> {
   const key = process.env["GEMINI_API_KEY"] || process.env["GOOGLE_API_KEY"];
   const provider = process.env["GOOGLE_GENAI_PROVIDER"] === "vertex" ? "vertex" : "gemini";
-  const model = process.env["GEMINI_FAST_MODEL"] || "gemini-2.5-flash";
+  const model =
+    process.env["GEMINI_FAST_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-2.5-flash";
   const host = new URL(request.url).hostname;
   const local = ["127.0.0.1", "localhost", "::1", "[::1]"].includes(host);
   const enabled = local || process.env["RESEARCH_AGENT_ENABLED"] === "true";
@@ -172,20 +173,33 @@ export async function handleResearch(request: Request): Promise<Response> {
     );
     const text = output.text;
     if (input.mode === "compare")
-      return json({ ...validateComparison(JSON.parse(text), input.competitors), provider, model });
+      return json({
+        ...validateComparison(JSON.parse(text), input.competitors),
+        provider: output.provider,
+        model: output.model,
+      });
     if (input.mode === "extract")
-      return json({ ...validateExtraction(JSON.parse(text), input.text), provider, model });
+      return json({
+        ...validateExtraction(JSON.parse(text), input.text),
+        provider: output.provider,
+        model: output.model,
+      });
     const sources = output.sources;
     return json({
       text: text.replaceAll("\u2014", "; "),
       sources,
       searchQueries: [],
-      provider,
-      model,
+      provider: output.provider,
+      model: output.model,
       searched: sources.length > 0,
       includedRecordIds: input.records.map((r) => r.id),
     });
   } catch (error) {
+    if (
+      error instanceof Error &&
+      /^(KEY_|QUOTA_|MODEL_|DNS_|REQUEST_|SOURCE_|RESEARCH_)/.test(error.message)
+    )
+      return json({ error: publicAgentError(error) }, 502);
     const cause =
       error instanceof Error ? (error.cause as { code?: string } | undefined) : undefined;
     if (error instanceof Error && ["TimeoutError", "AbortError"].includes(error.name))

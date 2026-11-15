@@ -1,14 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  RefreshCw,
-  Download,
-  MessageSquare,
-  Search,
-  GitCompareArrows,
-  ListChecks,
-} from "lucide-react";
+import { ArrowRight, RefreshCw, Download, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { SourceBadge } from "./source-badge";
 import { KEARNEY_CATALOG, PUBLISHED_CONTEXT, kearneyEntry } from "@/data/kearney-products";
@@ -31,19 +23,28 @@ const reportSchema = z.object({
   analysis: analysisSchema.optional(),
   records: z.array(evidenceSchema),
   errors: z.array(z.string()),
+  description: z
+    .object({
+      text: z.string(),
+      mode: z.enum(["live", "cached", "authorized-excerpt", "seed-demo"]),
+      sourceUrl: z.string(),
+    })
+    .optional(),
+  providerModels: z.array(z.string()).optional(),
   trace: z.array(z.object({ agent: z.string(), message: z.string(), at: z.string() })),
 });
 type Report = z.infer<typeof reportSchema>;
 const tabs = [
-  { id: "overview", label: "Overview", icon: Search },
-  { id: "comments", label: "Comments", icon: MessageSquare },
-  { id: "compare", label: "Compare", icon: GitCompareArrows },
-  { id: "roadmap", label: "Roadmap", icon: ListChecks },
+  { id: "overview", label: "Kearney Analysis", icon: RefreshCw },
+  { id: "comments", label: "Comment Analysis", icon: MessageSquare },
 ] as const;
-const cacheKey = "signalscope:portfolio-reports:v1";
+const cacheKey = "signalscope:portfolio-reports:v2";
 export function PortfolioWorkspace() {
   const { product, setProductId, records, importRecords, hydrated } = useDemo();
   const entry = kearneyEntry(product.id) || KEARNEY_CATALOG[0]!;
+  const [step, setStep] = useState(0);
+  const [excerpt, setExcerpt] = useState("");
+  const [health, setHealth] = useState("");
   const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("overview");
   const [reports, setReports] = useState<Record<string, Report>>({});
   const [notice, setNotice] = useState("");
@@ -88,8 +89,12 @@ export function PortfolioWorkspace() {
         const response = await fetch("/api/portfolio", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId: id, refresh }),
-          signal: AbortSignal.timeout(15000),
+          body: JSON.stringify({
+            productId: id,
+            refresh,
+            ...(excerpt.trim().length >= 100 ? { excerpt: excerpt.trim() } : {}),
+          }),
+          signal: AbortSignal.timeout(300000),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Could not start research.");
@@ -100,7 +105,7 @@ export function PortfolioWorkspace() {
         setPending(null);
       }
     },
-    [entry.id, update],
+    [entry.id, update, excerpt],
   );
   useEffect(() => {
     if (!ready || !hydrated) return;
@@ -200,34 +205,35 @@ export function PortfolioWorkspace() {
   ];
   return (
     <div className="portfolio-workspace space-y-6">
+      <nav className="flow-progress" aria-label="Research progress">
+        {["Select product", "Analyze", "Build roadmap"].map((name, i) => (
+          <button
+            key={name}
+            aria-current={step === i ? "step" : undefined}
+            onClick={() => setStep(i)}
+          >
+            <span>{i + 1}</span>
+            {name}
+          </button>
+        ))}
+      </nav>
       <section className="renewal-hero">
-        <span className="section-kicker">Kearney PERLab hackathon · Independent prototype</span>
-        <h1>Turn customer voices into the next product decision.</h1>
-        <p>Find pain points. Check the alternatives. Build a source-backed renewal roadmap.</p>
-        <div className="renewal-steps">
-          {[
-            "Ingest feedback",
-            "Analyze pain points",
-            "Benchmark competitors",
-            "Generate roadmap",
-          ].map((step, i) => (
-            <span key={step}>
-              <b>{i + 1}</b>
-              {step}
-              {i < 3 && <ArrowRight size={13} />}
-            </span>
-          ))}
-        </div>
-        <SourceBadge
-          url="https://www.kearney.com/web/product-excellence-and-renewal-lab/what-we-do"
-          platform="Kearney.com"
-          detail="Workflow inspired by public PERLab design-for-growth and design-for-margin positioning. Not an official integration or endorsement."
-        />
+        <span className="section-kicker">Consumer insights / Product renewal</span>
+        <h1>Kearney Product &amp; Portfolio Analysis</h1>
+        <p>What customers want. What holds them back. What to improve next.</p>
       </section>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="portfolio-heading">
         <div>
-          <span className="section-kicker">Flagship workspace</span>
-          <h2 className="text-2xl font-semibold">Kearney Product &amp; Portfolio Analysis</h2>
+          <h2>
+            {step === 0
+              ? "Choose your product"
+              : step === 1
+                ? "Follow the evidence"
+                : "Decide what to test next"}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {entry.name} · {entry.category}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -248,69 +254,166 @@ export function PortfolioWorkspace() {
           </Button>
         </div>
       </div>
-      <div className="portfolio-selector" role="group" aria-label="Kearney portfolio products">
-        {KEARNEY_CATALOG.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            aria-pressed={entry.id === p.id}
-            onClick={() => {
-              setProductId(p.id);
-              setNotice("");
-            }}
-          >
-            <strong>{p.name}</strong>
-            <small>{p.category}</small>
-          </button>
-        ))}
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Publicly documented offering subset, not Kearney's complete internal catalog. Ignite is a
-        service; “DeepFind Analytics” could not be verified as a Kearney product and is not treated
-        as one.
-      </p>
-      <SourceBadge
-        url="https://www.kearney.com/service/strategy-growth/innovation-for-growth/ignite/"
-        platform="Kearney.com"
-      />
-      <div className="research-run" role="status">
-        <span className={busy ? "scope-dot" : ""} />
-        <strong>
-          {busy
-            ? report?.stage || "Starting research…"
-            : report?.status === "complete"
-              ? "Research complete; source review recommended"
-              : report?.status === "failed"
-                ? "Research needs attention"
-                : "Research starts automatically for the selected product"}
-        </strong>
-        <small>
-          Gemini research uses server credentials and may take several minutes. Cached for 24 hours.
-          No private platform sign-in is bypassed.
-        </small>
-        {notice && <p>{notice}</p>}
-        {report?.errors.map((error, i) => (
-          <p key={i}>{error}</p>
-        ))}
-      </div>
-      <div className="portfolio-tabs" role="tablist" aria-label="Product analysis tabs">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            aria-controls={`panel-${t.id}`}
-            id={`tab-${t.id}`}
-            onClick={() => setTab(t.id)}
-          >
-            <t.icon size={16} />
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="space-y-5">
-        {tab === "overview" && (
+      <section
+        className="product-description rounded-xl border bg-paper p-5"
+        aria-label="Product description"
+      >
+        <span className="section-kicker">
+          {report?.description
+            ? `${report.description.mode === "seed-demo" ? "Demo seed description" : report.description.mode.replaceAll("-", " ") + " description"}`
+            : "Demo seed description · reference summary"}
+        </span>
+        <h2 className="text-2xl font-semibold my-2">{entry.name}</h2>
+        <p>{report?.description?.text || entry.description}</p>
+        <SourceBadge
+          url={report?.description?.sourceUrl || entry.source.url}
+          platform={entry.source.platform}
+          detail="Provider context, not a customer review or measured finding"
+        />
+      </section>
+      {step === 0 && (
+        <>
+          <div className="portfolio-selector" role="group" aria-label="Kearney portfolio products">
+            {KEARNEY_CATALOG.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                aria-pressed={entry.id === p.id}
+                onClick={() => {
+                  setProductId(p.id);
+                  setNotice("");
+                }}
+              >
+                <strong>{p.name}</strong>
+                <small>{p.category}</small>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Publicly documented offering subset, not Kearney's complete internal catalog. Ignite is
+            a service; “DeepFind Analytics” could not be verified as a Kearney product and is not
+            treated as one.
+          </p>
+          <SourceBadge
+            url="https://www.kearney.com/service/strategy-growth/innovation-for-growth/ignite/"
+            platform="Kearney.com"
+          />
+          <div className="flow-next">
+            <Button onClick={() => setStep(1)}>
+              Next: analyze {entry.name}
+              <ArrowRight size={16} />
+            </Button>
+          </div>
+        </>
+      )}
+      {step !== 0 && (
+        <div className="research-run" role="status">
+          <span className={busy ? "scope-dot" : ""} />
+          <strong>
+            {busy
+              ? report?.stage || "Starting research…"
+              : report?.status === "complete"
+                ? "Research complete; source review recommended"
+                : report?.status === "failed"
+                  ? "Research needs attention"
+                  : "Research starts automatically for the selected product"}
+          </strong>
+          <small>
+            Gemini research uses server credentials and may take several minutes. Cached for 24
+            hours. No private platform sign-in is bypassed.
+          </small>
+          {notice && <p>{notice}</p>}
+          {[...new Set(report?.errors ?? [])].map((error, i) => (
+            <p key={i}>{error}</p>
+          ))}
+          {report?.providerModels?.length ? (
+            <small>
+              Models used: {report.providerModels.join(", ")}. Model access fallback is enabled.
+            </small>
+          ) : null}
+          <details className="mt-3">
+            <summary>Connection check &amp; authorized source fallback</summary>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                setHealth("Checking provider...");
+                try {
+                  const r = await fetch("/api/agent-health", {
+                    method: "POST",
+                    signal: AbortSignal.timeout(130000),
+                  });
+                  const d = await r.json();
+                  setHealth(
+                    d.ok ? `Connected: ${d.provider} / ${d.model}` : d.error || "Connection failed",
+                  );
+                } catch {
+                  setHealth(
+                    "REQUEST_TIMEOUT: Server did not return in time. Check server connectivity.",
+                  );
+                }
+              }}
+            >
+              Test AI connection
+            </Button>
+            <p>{health}</p>
+            <label className="block mt-3">
+              Authorized product-page excerpt (100–15,000 characters)
+              <textarea
+                aria-label="Authorized product excerpt"
+                className="research-input"
+                maxLength={15000}
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                placeholder="Paste text you have permission to use from the selected product’s official page. It remains provider context, not customer feedback."
+              />
+            </label>
+            <p className="text-xs">
+              By refreshing with an excerpt, you confirm permission to use it. Text is sent to the
+              configured AI provider. Private platform sign-in is never bypassed.
+            </p>
+            <SourceBadge
+              url={entry.source.url}
+              platform={entry.source.platform}
+              detail="Selected official source for an authorized excerpt"
+            />
+          </details>
+        </div>
+      )}
+      {step === 1 && (
+        <div className="portfolio-tabs" role="tablist" aria-label="Product analysis tabs">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              aria-controls={`panel-${t.id}`}
+              id={`tab-${t.id}`}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+                  event.preventDefault();
+                  const next = tab === "overview" ? "comments" : "overview";
+                  setTab(next);
+                  document.getElementById(`tab-${next}`)?.focus();
+                }
+              }}
+              tabIndex={tab === t.id ? 0 : -1}
+              onClick={() => setTab(t.id)}
+            >
+              <t.icon size={16} />
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <div
+        role="tabpanel"
+        id={`panel-${tab}`}
+        aria-label={step === 2 ? "Product roadmap" : "Product analysis"}
+        className="space-y-5"
+      >
+        {step === 1 && tab === "overview" && (
           <>
             <div className="grid gap-4 lg:grid-cols-2">
               <article className="rounded-xl border bg-paper p-5">
@@ -361,8 +464,9 @@ export function PortfolioWorkspace() {
                   ))}
                 </div>
                 <p className="text-sm mt-4 text-muted-foreground">
-                  No customer records means no measured sentiment or diagnosed customer flaw.
-                  Provider claims and market commentary stay separate.
+                  These counts measure evidence coverage, not customer demand. No customer records
+                  means no measured sentiment or diagnosed customer flaw. Provider claims and market
+                  commentary stay separate.
                 </p>
                 <SourceBadge detail="Calculation: collected records for this product; no inferred customers" />
                 <details className="metric-help">
@@ -377,29 +481,31 @@ export function PortfolioWorkspace() {
                 </details>
               </article>
             </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div>
-                <NeedsChart
-                  records={feedback}
-                  onSelect={(need) => {
-                    window.location.href = `/desires?need=${need}`;
-                  }}
-                />
-                {catalogFeedbackSources.map((url) => (
-                  <SourceBadge key={url} url={url} />
-                ))}
-                {!feedback.length && (
-                  <SourceBadge detail="No customer-feedback corpus captured for this product" />
-                )}
+            {feedback.length > 0 && (
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div>
+                  <NeedsChart
+                    records={feedback}
+                    onSelect={(need) => {
+                      window.location.href = `/desires?need=${need}`;
+                    }}
+                  />
+                  {catalogFeedbackSources.map((url) => (
+                    <SourceBadge key={url} url={url} />
+                  ))}
+                  {!feedback.length && (
+                    <SourceBadge detail="No customer-feedback corpus captured for this product" />
+                  )}
+                </div>
+                <div>
+                  <SourceChart records={feedback} />
+                  {catalogFeedbackSources.map((url) => (
+                    <SourceBadge key={url} url={url} />
+                  ))}
+                </div>
               </div>
-              <div>
-                <SourceChart records={feedback} />
-                {catalogFeedbackSources.map((url) => (
-                  <SourceBadge key={url} url={url} />
-                ))}
-              </div>
-            </div>
-            <CoOccurrenceChart records={feedback} />
+            )}
+            {feedback.length > 0 && <CoOccurrenceChart records={feedback} />}
             <SourceBadge
               detail={`Calculated from ${feedback.length} saved customer records; association, not causality`}
             />
@@ -413,7 +519,7 @@ export function PortfolioWorkspace() {
             </div>
           </>
         )}
-        {tab === "comments" && (
+        {step === 1 && tab === "comments" && (
           <>
             <div className="rounded-xl border bg-paper p-5">
               <h3 className="text-lg font-semibold">Customer sentiment, not marketing sentiment</h3>
@@ -443,8 +549,8 @@ export function PortfolioWorkspace() {
               <div className="workspace-notice">
                 <strong>No verified customer-feedback collection yet.</strong>
                 <p>
-                  Public product pages do not substitute for user reviews. Run research or ingest a
-                  permitted original comment below.
+                  Public product pages do not substitute for user reviews. Run research, collect a
+                  direct response, or ingest a permitted original comment below.
                 </p>
                 <SourceBadge
                   detail={`Current collection for ${entry.name}: zero collected feedback records`}
@@ -507,6 +613,16 @@ export function PortfolioWorkspace() {
                 </blockquote>
               ))}
             </details>
+            <div className="flex flex-wrap gap-3 text-sm">
+              <Link to="/feedback" className="scope-cta">
+                Collect a customer response
+                <ArrowRight size={14} />
+              </Link>
+              <Link to="/data" className="scope-cta">
+                Import permitted evidence
+                <ArrowRight size={14} />
+              </Link>
+            </div>
             <ResearchAgent />
             <div>
               <Link to="/evidence" className="text-primary underline text-sm">
@@ -515,7 +631,7 @@ export function PortfolioWorkspace() {
             </div>
           </>
         )}
-        {tab === "compare" && (
+        {step === 1 && tab === "overview" && (
           <>
             <h3 className="text-xl font-semibold">{entry.name} and its discovered alternatives</h3>
             <p className="text-sm text-muted-foreground">
@@ -608,7 +724,7 @@ export function PortfolioWorkspace() {
             )}
           </>
         )}
-        {tab === "roadmap" && (
+        {step === 2 && (
           <>
             <h3 className="text-xl font-semibold">Product improvements supported by evidence</h3>
             <p className="text-sm text-muted-foreground">
@@ -675,6 +791,30 @@ export function PortfolioWorkspace() {
               Record an experiment and outcome in the shared company pilot
             </Link>
           </>
+        )}
+      </div>
+      <div className="flow-next">
+        {step > 0 && (
+          <Button variant="outline" onClick={() => setStep(step - 1)}>
+            Back
+          </Button>
+        )}
+        {step === 1 && (
+          <Button
+            onClick={() => {
+              setStep(2);
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
+          >
+            Next: product roadmap
+            <ArrowRight size={16} />
+          </Button>
+        )}
+        {step === 2 && (
+          <Button onClick={exportReport}>
+            Finish: export research brief
+            <Download size={16} />
+          </Button>
         )}
       </div>
       <details className="rounded-xl border bg-paper p-5">

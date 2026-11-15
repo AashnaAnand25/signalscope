@@ -1,22 +1,27 @@
-# SignalScope verification loop
+# SignalScope delivery loop
 
-Goal: keep the app clear to a first-time researcher while preserving source provenance.
+Goal: a source-grounded consumer-insights flow, landing → product → analysis → roadmap, with actionable provider errors and Vercel-compatible execution.
 
-## Done when
-- `bun run typecheck`, `bun run test`, `bun run lint`, and `bun run build` pass.
-- All seven routes return successful HTML from the production server.
-- AI input validation, missing-key handling, exact quote checks, and explicit import review pass tests.
-- Browser checks cover desktop/mobile, theme persistence, collapsed navigation, survey submission, and evidence drill-down when browser tools are available.
-- Report separates verified behavior from unavailable network/browser checks.
-
-## Each iteration
-1. Fix one observed failure.
-2. Run the relevant test, then the full checks before committing.
-3. Record evidence and remaining limitations in `docs/FRONTEND_REVIEW.md`.
-4. Stop when checks pass, or report a concrete external blocker after two attempts.
+## Verify every increment
+- `bun run typecheck`
+- `bun run test`
+- `bun run build`
+- `bun run test:e2e` against localhost; repeat with BASE_URL against verified deployment.
 
 ## Guardrails
-- Never read `.env`, expose secrets, weaken tests, or rewrite published history.
-- No autonomous data scraping, automatic AI imports, or fabricated metrics.
-- Source text stays separate from editable tags.
-- No scheduled loop or background agent is configured. Run this checklist within the current task only.
+- Never inspect `.env`, print credentials, invent reviews, or equate missing evidence with negative demand.
+- Preserve existing datasets, original feedback, source URLs, reviewer edits and public guest access.
+- Use specific provider errors. Never weaken tests to report success.
+- Keep model fallbacks explicit and reported; no quota retry loops.
+- Deployment and live-provider checks must be reported separately from fixture tests.
+
+## Acceptance
+- [ ] Working Gemini or specific actionable error
+- [ ] Descriptions for every offering, independent of provider success
+- [ ] Automatic cited competitors, no manual competitor fields
+- [ ] Cited comparison and coverage charts
+- [ ] Guided two-tab analysis and roadmap
+- [ ] Responsive/reduced-motion checks, no application console errors
+- [ ] Verified deployment URL or exact deployment blocker
+
+Single-agent execution with repository tests and Playwright. Progress: docs/DELIVERY_REPORT.md.

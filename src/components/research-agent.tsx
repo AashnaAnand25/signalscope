@@ -51,7 +51,7 @@ export function ResearchAgent() {
     try {
       const response = await fetch("/api/research", {
         method: "POST",
-        signal: AbortSignal.timeout(50000),
+        signal: AbortSignal.timeout(130000),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode,

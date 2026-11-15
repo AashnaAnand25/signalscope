@@ -1,10 +1,20 @@
 # SignalScope
 
-Customer evidence. Clearer decisions.
+Voice-of-customer driven product renewal.
 
 A corporate consumer-intelligence workspace for the Kearney × PERLab Consumer Insights challenge. Reviews, product questions, discussions, and survey responses connect to customer desires, evidence gaps, and product experiments. The campus backpack is a fictional demonstration product.
 
 The separate [Kearney PERLab company pilot](docs/COMPANY_SETUP.md) adds shared SQLite data, configurable client product variants, cited evidence review, decision records, outcome entry, and a public survey endpoint. Kearney's public pages provide an offering brief only; real client evidence and deployment decisions are still needed.
+
+## Guided product renewal
+
+Home → Try now → select a Kearney offering → Kearney Analysis / Comment Analysis → product roadmap → export brief. Advanced tools remain under Resources.
+
+Descriptions remain available when AI fails. Provider claims never substitute for customer reviews. Competitors are discovered automatically, with unknown comparison cells where sources are missing. The original backpack demo remains available through the data workspace.
+
+- [Delivery report and verification limits](docs/DELIVERY_REPORT.md)
+- [Server keys, providers, models and Vercel deployment](docs/AI_SETUP.md)
+- Browser check: `bun run test:e2e` (fixture API mode); `BASE_URL=https://your-domain bun run test:e2e` for deployment. Fixtures test UI behavior, not actual market research.
 
 ## Local setup
 

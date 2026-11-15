@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 export type AgentTask = "tagging" | "reasoning" | "search";
 export type AgentOutput = {
   text: string;
@@ -17,27 +17,48 @@ export class GeminiProvider implements AgentProvider {
   async generate(task: AgentTask, prompt: string, json = false): Promise<AgentOutput> {
     const key = process.env["GEMINI_API_KEY"] || process.env["GOOGLE_API_KEY"];
     if (!key) throw new Error("GEMINI_API_KEY is missing. Configure it on the server.");
-    const model =
+    let model =
       task === "tagging"
-        ? process.env["GEMINI_FAST_MODEL"] || "gemini-2.5-flash"
-        : process.env["GEMINI_REASONING_MODEL"] || "gemini-2.5-pro";
+        ? process.env["GEMINI_FAST_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-2.5-flash"
+        : process.env["GEMINI_REASONING_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-2.5-pro";
     const client = new GoogleGenAI({
       apiKey: key,
       ...(process.env["GOOGLE_GENAI_PROVIDER"] === "vertex" ? { vertexai: true } : {}),
       httpOptions: { timeout: 55000 },
     });
-    const response = await client.models.generateContent({
-      model,
-      contents: prompt,
-      config: {
-        systemInstruction: instruction,
-        temperature: 0.1,
-        maxOutputTokens: 8192,
-        ...(task === "search" ? { tools: [{ googleSearch: {} }] } : {}),
-        ...(json ? { responseMimeType: "application/json" } : {}),
-        thinkingConfig: { thinkingBudget: task === "tagging" ? 512 : 1024 },
-      },
-    });
+    const call = (selected: string) =>
+      client.models.generateContent({
+        model: selected,
+        contents: prompt,
+        config: {
+          systemInstruction: instruction,
+          maxOutputTokens: 8192,
+          ...(task === "search" ? { tools: [{ googleSearch: {} }] } : {}),
+          ...(json ? { responseMimeType: "application/json" } : {}),
+          ...(selected.startsWith("gemini-2.5")
+            ? {
+                temperature: 0.1,
+                thinkingConfig: { thinkingBudget: task === "tagging" ? 512 : 1024 },
+              }
+            : { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } }),
+        },
+      });
+    let response;
+    try {
+      response = await call(model);
+    } catch (e) {
+      // Retry only a model-not-found error, never invalid keys, quota or network failures.
+      const status = (e as { status?: number }).status;
+      const fallback = process.env["GEMINI_FALLBACK_MODEL"] || "gemini-3.8-flash";
+      if (status === 404 && model.startsWith("gemini-2.5") && fallback !== "disabled") {
+        model = fallback;
+        try {
+          response = await call(model);
+        } catch (retry) {
+          throw new Error(publicAgentError(retry));
+        }
+      } else throw new Error(publicAgentError(e));
+    }
     const sources = (response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? []).flatMap(
       (chunk) =>
         chunk.web?.uri?.startsWith("https://")
@@ -89,8 +110,10 @@ export function agentProvider(task: AgentTask): AgentProvider {
   if (selected === "serper" && task === "search") return new SerperProvider();
   if (selected === "gemini") return new GeminiProvider();
   if (selected === "openai") return new OpenAIProvider();
+  if (selected === "anthropic") return new AnthropicProvider();
+  if (selected === "perplexity") return new PerplexityProvider();
   throw new Error(
-    `Unsupported agent provider: ${selected}. Supported: gemini, openai, serper (search only).`,
+    `Unsupported agent provider: ${selected}. Supported: gemini, openai, anthropic, perplexity, serper (search only).`,
   );
 }
 export function parseAgentJson(text: string): unknown {
@@ -126,5 +149,118 @@ export class SerperProvider implements AgentProvider {
       model: "google-search",
       provider: this.name,
     };
+  }
+}
+
+/** Actionable public diagnostics. Never return raw provider errors, headers or credentials. */
+export function publicAgentError(error: unknown): string {
+  const e = error as {
+    status?: number;
+    code?: string;
+    message?: string;
+    name?: string;
+    cause?: { code?: string };
+  };
+  const text = e?.message || "";
+  const status = e?.status;
+  if (/missing|requires|Unsupported agent/.test(text) && text.length < 200) return text;
+  if (status === 429 || /RESOURCE_EXHAUSTED|HTTP 429/.test(text))
+    return "QUOTA_EXCEEDED: Provider quota or rate limit reached. Check billing and quota, then retry.";
+  if (
+    status === 401 ||
+    status === 403 ||
+    /API_KEY_INVALID|API key not valid|(?:OpenAI|Serper|Firecrawl).*HTTP 40[13]/.test(text)
+  )
+    return "KEY_REJECTED: Provider rejected the server API key or project permissions. Check key restrictions and API access.";
+  if (status === 404 || /NOT_FOUND|HTTP 404/.test(text))
+    return "MODEL_UNAVAILABLE: Selected model is unavailable to this project. Set GEMINI_FAST_MODEL and GEMINI_REASONING_MODEL to an accessible model, such as gemini-3.8-flash.";
+  if (/ENOTFOUND|EAI_AGAIN|getaddrinfo/.test(text + e?.code + e?.cause?.code))
+    return "DNS_UNREACHABLE: This server cannot resolve the provider or source hostname. Check server network/DNS access.";
+  if (/timeout|timed out|AbortError|TimeoutError/i.test(text + e?.name))
+    return "REQUEST_TIMEOUT: Provider or source exceeded its time limit. Retry or use an authorized excerpt.";
+  if (/robots|disallowed/i.test(text))
+    return "SOURCE_DISALLOWED: Source robots policy could not be verified or disallows capture. Use an authorized excerpt.";
+  if (/sign-in|blocked|HTTP 403|HTTP 429/i.test(text))
+    return "SOURCE_BLOCKED: This page denied automated access or requires sign-in. Use an authorized export; no sign-in is bypassed.";
+  if (/HTTP \d+/.test(text))
+    return `SOURCE_HTTP_ERROR: ${text.match(/HTTP \d+/)?.[0]}. Retry later or supply an authorized excerpt.`;
+  if (/no usable|No source pages|quote|cited|customer-feedback|invented|duplicated/.test(text))
+    return text.slice(0, 250);
+  if (/^(QUOTA_|KEY_|MODEL_|DNS_|REQUEST_|SOURCE_)/.test(text)) return text;
+  return "RESEARCH_FAILED: No valid result returned. Check provider availability, model configuration and source access. Nothing unsupported was saved.";
+}
+
+export class AnthropicProvider implements AgentProvider {
+  readonly name = "anthropic";
+  async generate(task: AgentTask, prompt: string, json = false): Promise<AgentOutput> {
+    if (task === "search")
+      throw new Error(
+        "Anthropic adapter requires AGENT_SEARCH_PROVIDER=gemini, serper or perplexity for live search.",
+      );
+    const key = process.env["ANTHROPIC_API_KEY"],
+      model = process.env["ANTHROPIC_MODEL"];
+    if (!key || !model)
+      throw new Error("Anthropic routing requires ANTHROPIC_API_KEY and ANTHROPIC_MODEL.");
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 8192,
+        system: instruction,
+        messages: [
+          { role: "user", content: prompt + (json ? "\nReturn one JSON object only." : "") },
+        ],
+      }),
+      signal: AbortSignal.timeout(55000),
+    });
+    if (!r.ok)
+      throw Object.assign(new Error("Anthropic provider rejected request"), { status: r.status });
+    const data = await r.json();
+    const text = (data.content ?? [])
+      .filter((c: { type: string }) => c.type === "text")
+      .map((c: { text: string }) => c.text)
+      .join("\n");
+    if (!text) throw new Error("Anthropic returned no usable answer.");
+    return { text, sources: [], model, provider: this.name };
+  }
+}
+export class PerplexityProvider implements AgentProvider {
+  readonly name = "perplexity";
+  async generate(task: AgentTask, prompt: string, json = false): Promise<AgentOutput> {
+    const key = process.env["PERPLEXITY_API_KEY"],
+      model = process.env["PERPLEXITY_MODEL"];
+    if (!key || !model)
+      throw new Error("Perplexity routing requires PERPLEXITY_API_KEY and PERPLEXITY_MODEL.");
+    const r = await fetch("https://api.perplexity.ai/v1/responses", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        instructions: instruction,
+        input: prompt + (json ? "\nReturn one JSON object only." : ""),
+        ...(task === "search" ? { tools: [{ type: "web_search" }] } : {}),
+      }),
+      signal: AbortSignal.timeout(55000),
+    });
+    if (!r.ok)
+      throw Object.assign(new Error("Perplexity provider rejected request"), { status: r.status });
+    const data = await r.json();
+    const parts = (data.output ?? []).flatMap(
+      (o: { content?: { text?: string; annotations?: { url?: string; title?: string }[] }[] }) =>
+        o.content ?? [],
+    );
+    const text = parts.map((p: { text?: string }) => p.text || "").join("\n");
+    const sources = parts.flatMap((p: { annotations?: { url?: string; title?: string }[] }) =>
+      (p.annotations ?? [])
+        .filter((a) => a.url?.startsWith("https://"))
+        .map((a) => ({ url: a.url!, title: a.title || a.url! })),
+    );
+    if (!text) throw new Error("Perplexity returned no usable answer.");
+    return { text, sources, model, provider: this.name };
   }
 }

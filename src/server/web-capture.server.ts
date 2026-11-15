@@ -49,6 +49,35 @@ export function publicUrl(raw: string): URL {
 }
 type Download = { status: number; location?: string | undefined; type: string; body: string };
 async function download(url: URL): Promise<Download> {
+  // Fixed publisher allowlist can use the runtime's HTTPS proxy when raw DNS is unavailable.
+  // Dynamic competitor/user URLs still require DNS validation and pinned public addresses.
+  if (["www.kearney.com", "kearney.com", "perlab2xo.kearney.com"].includes(url.hostname)) {
+    const response = await fetch(url.href, {
+      redirect: "manual",
+      headers: { "User-Agent": agent, Accept: "text/html,text/plain" },
+      signal: AbortSignal.timeout(12000),
+    });
+    const reader = response.body?.getReader();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    if (reader)
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.length;
+        if (size > 1000000) {
+          await reader.cancel();
+          throw new Error("Source exceeds the 1 MB capture limit.");
+        }
+        chunks.push(value);
+      }
+    return {
+      status: response.status,
+      location: response.headers.get("location") || undefined,
+      type: response.headers.get("content-type") || "",
+      body: Buffer.concat(chunks).toString("utf8"),
+    };
+  }
   const addresses = await lookup(url.hostname, { all: true });
   if (!addresses.length || addresses.some((a) => !publicAddress(a.address)))
     throw new Error("Source resolves to a private or unsupported address.");
@@ -131,6 +160,34 @@ export async function capturePublicPage(raw: string) {
       throw new Error(
         "Automated access is disallowed or robots.txt could not be verified. Use a permitted manual excerpt.",
       );
+    if (process.env["SCRAPE_PROVIDER"] === "serper") {
+      const key = process.env["SERPER_API_KEY"];
+      if (!key) throw new Error("SERPER_API_KEY is missing. Configure the server key.");
+      const result = await fetch("https://scrape.serper.dev/", {
+        method: "POST",
+        headers: { "X-API-KEY": key, "Content-Type": "application/json" },
+        body: JSON.stringify({ url: current.href, includeMarkdown: true }),
+        signal: AbortSignal.timeout(25000),
+      });
+      if (!result.ok)
+        throw new Error(`Serper scrape returned HTTP ${result.status}. No source was saved.`);
+      const output = await result.json();
+      const text = output.markdown || output.text;
+      if (
+        typeof text !== "string" ||
+        text.length < 100 ||
+        /just a moment|verify you are human|access denied/i.test(text.slice(0, 250))
+      )
+        throw new Error("Source blocked or returned no readable text. Use an authorized excerpt.");
+      return {
+        title: String(output.metadata?.title || current.hostname).slice(0, 250),
+        text: text.slice(0, 18000),
+        truncated: text.length > 18000,
+        url: current.href,
+        capturedAt: new Date().toISOString(),
+        method: "public-html" as const,
+      };
+    }
     if (process.env["SCRAPE_PROVIDER"] === "firecrawl") {
       const key = process.env["FIRECRAWL_API_KEY"];
       if (!key)

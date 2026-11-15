@@ -1,47 +1,58 @@
-# Connect Google AI
+# SignalScope server AI setup
 
-The implementation is ready for a real Google API request. Successful live inference still requires a valid key and model access.
+Never put keys in browser code or a variable beginning `VITE_`. `.env` stays ignored. Copy `.env.example` for a new environment. Existing `.env` was not inspected during implementation.
 
-## Local setup
-1. Open `.env` yourself. It is ignored by Git and excluded from Docker builds.
-2. Set `GEMINI_API_KEY` to your key.
-3. Choose the matching provider:
-   - Google AI Studio key: `GOOGLE_GENAI_PROVIDER=gemini`.
-   - Google Cloud Vertex express-mode key: `GOOGLE_GENAI_PROVIDER=vertex`.
-4. Set `GEMINI_MODEL` to a model enabled for your account. Default: `gemini-3.8-flash`.
-5. Run `bun run build`, then `bun run start`. The start command loads `.env` at runtime.
-6. Open Data workspace > Research assistant.
+## Configuration
 
-Do not add a `VITE_` prefix to credentials. The browser calls `/api/research`; only the server calls Google.
+| Variable | Required? | Purpose / value | Where to obtain |
+|---|---|---|---|
+| `GEMINI_API_KEY` | For default AI | Server Google AI Studio API key | https://aistudio.google.com/apikey |
+| `GOOGLE_API_KEY` | Optional alias | Alternative name for the same Google credential | Google AI Studio |
+| `GOOGLE_GENAI_PROVIDER` | Optional | `gemini` default; `vertex` for Vertex express-mode API key | Google Cloud console for Vertex |
+| `GEMINI_MODEL` | Optional legacy alias | Used when task-specific Gemini model is unset | Google model access |
+| `GEMINI_FAST_MODEL` | Optional | Requested default `gemini-2.5-flash` | Available model IDs in your Google project |
+| `GEMINI_REASONING_MODEL` | Optional | Requested default `gemini-2.5-pro` | Available model IDs in your Google project |
+| `GEMINI_FALLBACK_MODEL` | Optional | `gemini-3.8-flash` on model-not-found only; `disabled` to disable fallback | Google model access |
+| `AGENT_PROVIDER` | Optional | Default router: `gemini`, `openai`, `anthropic`, `perplexity` | Configuration |
+| `AGENT_TAGGING_PROVIDER` | Optional | Override tagging provider | Configuration |
+| `AGENT_REASONING_PROVIDER` | Optional | Override synthesis provider | Configuration |
+| `AGENT_SEARCH_PROVIDER` | Optional | `gemini`, `serper`, or `perplexity` for web search | Configuration |
+| `SERPER_API_KEY` | For Serper | Search and optional scrape credentials | https://serper.dev |
+| `FIRECRAWL_API_KEY` | For Firecrawl | Rendered-page capture credentials | https://www.firecrawl.dev |
+| `SCRAPE_PROVIDER` | Optional | `native` default, `firecrawl`, or `serper`; policy checks still apply | Configuration |
+| `OPENAI_API_KEY` | For OpenAI | Tagging/synthesis credentials | https://platform.openai.com/api-keys |
+| `OPENAI_MODEL` | For OpenAI | Explicit accessible model ID | OpenAI console |
+| `ANTHROPIC_API_KEY` | For Anthropic | Tagging/synthesis credentials | https://console.anthropic.com |
+| `ANTHROPIC_MODEL` | For Anthropic | Explicit accessible model ID | Anthropic console |
+| `PERPLEXITY_API_KEY` | For Perplexity | Agent API credentials | https://www.perplexity.ai/settings/api |
+| `PERPLEXITY_MODEL` | For Perplexity | Explicit Agent API model ID | Perplexity console |
+| `RESEARCH_AGENT_ENABLED` | On hosted AI | `true` enables server-funded AI. Keep deployment access protected and usage monitored | Vercel environment settings |
+| `WEB_CAPTURE_ENABLED` | For hosted capture API | `true` enables the separate manual capture endpoint | Vercel environment settings |
+| `VERCEL_FUNCTION_MAX_DURATION` | Optional, build-time | `300` normal build; `60` temporary preview limit. Must fit account plan | Vercel plan/function settings |
+| `VERCEL` | Automatic | Chooses Nitro Vercel output and request-bound research, not detached background jobs | Set by Vercel |
 
-## What works when configured
-- Tag a passage: structured extraction, exact supporting quotation check, then explicit user selection before importing.
-- Ask your evidence: up to 40 eligible records, each capped at 3,000 characters. Synthetic evidence excluded unless selected. Answers are AI drafts, not calculated metrics.
-- Search the web: Google Search grounding with returned source links. A response without sources is explicitly labeled ungrounded.
+No additional key is required for the default Gemini + native capture path. Serper is an optional independent live-search route, not a fix for invalid Gemini credentials. Firecrawl is an optional renderer, not a private-platform sign-in bypass.
 
-The provider may decline a request, reject the selected model, or require billing/quota. Errors never turn into synthetic results. Tests use mocked provider responses and do not establish live account access.
+The existing Google project returned HTTP 404 for the requested 2.5 Flash model. The code now retries that model-access failure once with the explicit fallback. It does not retry rejected keys, quota failures or network timeouts. To skip legacy model checks, set both Gemini model variables to `gemini-3.8-flash`. Actual provider/model names are shown in completed run metadata and connection checks.
 
-## Google Cloud hosting
-A Dockerfile is included for Cloud Run. A project, billing configuration, deployment identity, and access policy have not been provided, so no cloud resources were created.
+## Connection check
 
-Deploy the container to a PRIVATE Cloud Run service. Supply credentials through Secret Manager as runtime environment variables, not Docker build arguments. For this express-key adapter, use `GOOGLE_GENAI_PROVIDER=vertex`. Leave `RESEARCH_AGENT_ENABLED=false` until access controls are configured; set it to `true` only behind authenticated hosting.
+Workspace → Analyze → Connection check → Test AI connection. A configured-key badge alone does not establish validity. Only a successful live request does. Errors distinguish missing keys, rejected credentials, quota, unavailable models, DNS, source policy and timeouts. Provider errors never expose raw credential-bearing responses.
 
-The current request cap is per server instance, not distributed. Before public multi-user deployment, add authenticated users, per-user quota enforcement, shared persistent storage, and production ADC/service-account authentication. This prototype does not implement those services.
+## Vercel
 
-## Velocity / Growth Signals
-The supplied research page redirects to invite-only sign-in. No accessible developer API contract or API credential was supplied. A browser URL is not a scraping API.
+1. Authenticate with `vercel login`, or claim the temporary preview in your browser.
+2. Add required server variables in project settings. Do not upload `.env` into the source repository.
+3. Enable protected access before setting `RESEARCH_AGENT_ENABLED=true`.
+4. Deploy: `vercel --prod`. Build uses Nitro's Vercel preset and request-bound research so serverless instances cannot abandon detached jobs.
+5. Rerun `BASE_URL=https://your-domain bun run test:e2e`. Fixture mode tests the UI with synthetic API responses. `LIVE_RESEARCH=1` does not stub the API; real competitor/data assertions still require a completed source-backed run.
 
-Supported now: export/copy permitted original customer passages, paste each into Tag a passage, supply its original source URL, review the proposed tags, then add it. Structured evidence JSON can also use the existing importer. Preserve original quotations and distinguish analyst summaries from customer statements. Do not label an AI summary as a customer quote.
+Server capture cache and localhost job state are process-local. Browser report cache is 24 hours and survives page reloads. A shared durable research cache and queue are future production work. A 60-second temporary preview is for UI review with AI disabled, not a reliable host for the full research pipeline.
 
-To build a direct connector, obtain the provider's documented API endpoint, authentication method, export schema, and permission to access the relevant workspace. No speculative Velocity endpoint is included.
+## References
 
-References:
-- https://ai.google.dev/api/generate-content
-- https://ai.google.dev/gemini-api/docs/structured-output
-- https://ai.google.dev/gemini-api/docs/google-search
-- https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys
-
-## Test outcome in the coding environment
-The application detected configured credentials after restart. The live request could not reach Google because hostname resolution failed (`ENOTFOUND`). This does not establish key validity. Start the app from your normal terminal or a network-enabled hosting environment to validate provider access. The credential file was not inspected during this test.
-
-Follow-up: after launch from the user's terminal, one live extraction request succeeded (HTTP 200, 10.7 seconds). Earlier network failures remain possible; retry once if a request times out. Live evidence questions and Google Search still require separate verification.
+- Google SDK: https://github.com/googleapis/js-genai
+- Gemini thinking/model migration: https://ai.google.dev/gemini-api/docs/generate-content/thinking
+- Anthropic Messages: https://platform.claude.com/docs/en/api/messages
+- Perplexity Agent API: https://docs.perplexity.ai/docs/agent-api/quickstart
+- Vercel function lifecycle: https://vercel.com/docs/functions/functions-api-reference

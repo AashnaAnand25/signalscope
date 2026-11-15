@@ -9,7 +9,7 @@ import {
   type ResearchDocument,
 } from "../../lib/portfolio-contract";
 import { capturePublicPage, publicUrl } from "../web-capture.server";
-import { agentProvider, parseAgentJson } from "./provider.server";
+import { agentProvider, parseAgentJson, publicAgentError } from "./provider.server";
 import type { EvidenceRecord } from "../../lib/types";
 export type PortfolioJob = {
   id: string;
@@ -23,21 +23,22 @@ export type PortfolioJob = {
   analysis?: PortfolioAnalysis;
   records: EvidenceRecord[];
   errors: string[];
+  description?: {
+    text: string;
+    mode: "live" | "cached" | "authorized-excerpt" | "seed-demo";
+    sourceUrl: string;
+  };
+  providerModels?: string[];
   trace: { agent: string; message: string; at: string }[];
 };
+const pageCache = new Map<string, { document: ResearchDocument; at: number }>();
 const jobs = new Map<string, PortfolioJob>();
 const stableId = (s: string) => createHash("sha256").update(s).digest("hex").slice(0, 16);
 const note = (job: PortfolioJob, agent: string, message: string) => {
   job.stage = message;
   job.trace.push({ agent, message, at: new Date().toISOString() });
 };
-const safeError = (e: unknown) =>
-  e instanceof Error &&
-  /missing|requires|Unsupported agent|returned HTTP|No source pages|no usable|quote|cited|customer-feedback|invented|duplicated/.test(
-    e.message,
-  )
-    ? e.message.slice(0, 250)
-    : "Provider or source request failed. Check network access, model availability and quota. No unsupported findings were added.";
+const safeError = publicAgentError;
 function kind(url: string, primary: boolean): ResearchDocument["kind"] {
   if (primary) return "provider-claim";
   const u = new URL(url);
@@ -61,7 +62,7 @@ async function capture(job: PortfolioJob, url: string, primary: boolean, subject
       ...job.competitors.map((c) => c.name),
     ].filter((name) => lower.includes(name.toLowerCase()));
     const identified = subject || (candidates.length === 1 ? candidates[0] : undefined);
-    job.documents.push({
+    const document: ResearchDocument = {
       id,
       url: data.url,
       title: data.title,
@@ -71,8 +72,27 @@ async function capture(job: PortfolioJob, url: string, primary: boolean, subject
       kind: kind(url, primary),
       status: "captured",
       ...(identified ? { subject: identified } : {}),
-    });
-  } catch {
+    };
+    job.documents.push(document);
+    pageCache.set(url, { document, at: Date.now() });
+    if (pageCache.size > 100) pageCache.delete(pageCache.keys().next().value!);
+    if (subject === kearneyEntry(job.productId)!.name)
+      job.description = { text: data.text.slice(0, 700), mode: "live", sourceUrl: data.url };
+  } catch (error) {
+    const cached = pageCache.get(url);
+    if (cached && Date.now() - cached.at < 86400000) {
+      job.documents.push({
+        ...cached.document,
+        note: "Cached capture, less than 24 hours old. Live refresh failed: " + safeError(error),
+      });
+      if (subject === kearneyEntry(job.productId)!.name)
+        job.description = {
+          text: cached.document.text.slice(0, 700),
+          mode: "cached",
+          sourceUrl: url,
+        };
+      return;
+    }
     job.documents.push({
       id,
       url,
@@ -82,12 +102,15 @@ async function capture(job: PortfolioJob, url: string, primary: boolean, subject
       capturedAt: new Date().toISOString(),
       kind: kind(url, primary),
       status: "blocked",
-      note: "Page could not be captured. It may require sign-in, deny bots, use unsupported content, or be unreachable. Use an authorized export; this source is not evidence for a claim.",
+      note: safeError(error),
     });
   }
 }
 async function search(job: PortfolioJob, prompt: string) {
   const output = await agentProvider("search").generate("search", prompt);
+  job.providerModels = [
+    ...new Set([...(job.providerModels ?? []), `${output.provider} / ${output.model}`]),
+  ];
   for (const source of output.sources.slice(0, 4)) {
     try {
       publicUrl(source.url);
@@ -99,11 +122,33 @@ async function search(job: PortfolioJob, prompt: string) {
   return output;
 }
 const outputShape = `Return JSON with comments:[{quote,documentId,kind:"customer-feedback"|"provider-claim"|"market-commentary",tone:"positive"|"mixed"|"negative",cluster,codings:[{desire:"features"|"price"|"quality"|"speed"|"convenience"|"reliability"|"appearance"|"sustainability"|"compatibility"|"customization",need,importance:"must-have"|"preference"|"unknown",fulfillment:"met"|"partly-met"|"unmet"|"conflicting"|"unknown"}]}], roadmap:[{title,improvement,hypothesis,experiment,documentIds:[id],quote,basis:"customer-feedback"|"market-commentary"|"provider-claim"}], matrix:[{product,pricing:{value,documentIds,quote},ai:{value,documentIds,quote},timeToValue:{value,documentIds,quote},sentiment:{value,documentIds,quote}}]. Every quote must be an exact substring of a cited captured document. No markdown. For missing matrix evidence set value:"Unknown", documentIds:[],quote:"". Never invent customer sentiment from provider claims. No numeric ratings, competitive scores or unsupported superiority claims. Comments must be attributed to the primary offering, never transfer a competitor's complaint to Kearney. Roadmap items are testable hypotheses, not proven flaws. Keep fewer than 12 comments and 4 roadmap items. Matrix has one row per named product. An absent review corpus is unknown, not positive sentiment.`;
-async function run(job: PortfolioJob) {
+async function run(job: PortfolioJob, excerpt?: string) {
   const entry = kearneyEntry(job.productId)!;
   try {
     note(job, "Source collector", "Capturing the official product description");
     await capture(job, entry.source.url, true, entry.name);
+    if (!job.description && excerpt) {
+      job.documents = job.documents.filter((d) => d.url !== entry.source.url);
+      job.documents.push({
+        id: `EXCERPT-${stableId(excerpt)}`,
+        url: entry.source.url,
+        title: entry.name + " authorized excerpt",
+        platform: entry.source.platform,
+        text: excerpt,
+        capturedAt: new Date().toISOString(),
+        subject: entry.name,
+        kind: "provider-claim",
+        status: "captured",
+        note: "User-provided authorized excerpt; not independently fetched.",
+      });
+      job.description = {
+        text: excerpt.slice(0, 700),
+        mode: "authorized-excerpt",
+        sourceUrl: entry.source.url,
+      };
+    }
+    if (!job.description)
+      job.description = { text: entry.description, mode: "seed-demo", sourceUrl: entry.source.url };
     note(
       job,
       "Feedback researcher",
@@ -128,6 +173,13 @@ async function run(job: PortfolioJob) {
         `Extract competitors from the search text ONLY. JSON {"competitors":[{"name":"exact offering name","url":"official HTTPS product URL","rationale":"relevance","relation":"direct|adjacent|service-alternative","sourceUrl":"one of the allowed URLs"}]}. No invented URLs. At most 5. Allowed source URLs: ${JSON.stringify(discovery.sources)}. Search text: ${discovery.text}`,
         true,
       );
+      job.providerModels = [
+        ...new Set([
+          ...(job.providerModels ?? []),
+          `${discovery.provider} / ${discovery.model}`,
+          `${extraction.provider} / ${extraction.model}`,
+        ]),
+      ];
       const candidates = z
         .object({ competitors: z.array(competitorSchema).max(5) })
         .parse(parseAgentJson(extraction.text)).competitors;
@@ -169,6 +221,9 @@ async function run(job: PortfolioJob) {
       `${outputShape}\nFocus comments on ${entry.name}. Return empty roadmap and matrix arrays at this stage. DOCUMENTS: ${JSON.stringify(texts)}`,
       true,
     );
+    job.providerModels = [
+      ...new Set([...(job.providerModels ?? []), `${tagged.provider} / ${tagged.model}`]),
+    ];
     const comments = analysisSchema.parse(parseAgentJson(tagged.text)).comments;
     note(job, "Renewal strategist", "Building a cited comparison and testable product roadmap");
     const names = [entry.name, ...job.competitors.map((c) => c.name)];
@@ -177,6 +232,9 @@ async function run(job: PortfolioJob) {
       `${outputShape}\nPrimary product: ${entry.name}. Product rows: ${JSON.stringify(names)}. Compare pricing model, AI capabilities, time-to-value and ACTUAL customer sentiment only where captured. Return comments:[] because tagging has already occurred. DOCUMENTS: ${JSON.stringify(texts)}`,
       true,
     );
+    job.providerModels = [
+      ...new Set([...(job.providerModels ?? []), `${synthesis.provider} / ${synthesis.model}`]),
+    ];
     const result = analysisSchema.parse(parseAgentJson(synthesis.text));
     job.analysis = validateAnalysis({ ...result, comments }, captured, names);
     job.records = job.analysis.comments
@@ -226,16 +284,22 @@ export async function handlePortfolio(request: Request) {
     return response({ error: "Same-origin requests only" }, 403);
   try {
     const raw = await request.text();
-    if (raw.length > 1000) return response({ error: "Request too large" }, 413);
-    const { productId, refresh } = z
-      .object({ productId: z.string(), refresh: z.boolean().default(false) })
+    if (raw.length > 20000) return response({ error: "Request too large" }, 413);
+    const { productId, refresh, excerpt } = z
+      .object({
+        productId: z.string(),
+        refresh: z.boolean().default(false),
+        excerpt: z.string().min(100).max(15000).optional(),
+      })
       .parse(JSON.parse(raw));
     if (!KEARNEY_CATALOG.some((p) => p.id === productId))
       return response({ error: "Unknown portfolio product" }, 400);
     if (!(
       process.env["GEMINI_API_KEY"] ||
       process.env["GOOGLE_API_KEY"] ||
-      (process.env["OPENAI_API_KEY"] && process.env["SERPER_API_KEY"])
+      process.env["OPENAI_API_KEY"] ||
+      process.env["ANTHROPIC_API_KEY"] ||
+      process.env["PERPLEXITY_API_KEY"]
     ))
       return response(
         { error: "Add GEMINI_API_KEY to the server environment. No research was started." },
@@ -266,7 +330,8 @@ export async function handlePortfolio(request: Request) {
       trace: [],
     };
     jobs.set(job.id, job);
-    void run(job);
+    if (process.env["VERCEL"]) await run(job, excerpt);
+    else void run(job, excerpt);
     return response(job, 202);
   } catch {
     return response({ error: "Invalid portfolio request" }, 400);
