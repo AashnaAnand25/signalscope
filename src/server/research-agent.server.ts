@@ -111,7 +111,11 @@ export async function handleResearch(request: Request): Promise<Response> {
       configured: Boolean(key) && enabled,
       provider,
       model,
-      missing: !key ? "GEMINI_API_KEY" : !enabled ? "RESEARCH_AGENT_ENABLED" : null,
+      missing: !key
+        ? `${selectedProvider.toUpperCase()}_API_KEY`
+        : !enabled
+          ? "RESEARCH_AGENT_ENABLED"
+          : null,
     });
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
   if (!enabled)

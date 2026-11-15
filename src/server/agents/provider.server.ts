@@ -275,7 +275,7 @@ export class GroqProvider implements AgentProvider {
       throw new Error("GROQ_API_KEY is missing. Add a free-plan key from console.groq.com/keys.");
     if (task === "search")
       throw new Error(
-        "Groq text inference does not provide verified web search in this adapter. Use an authorized excerpt or configure a separate search provider.",
+        "Groq text inference requires a separate search provider. Use authorized source excerpts for this free setup.",
       );
     const model = process.env["GROQ_MODEL"] || "openai/gpt-oss-20b";
     const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
