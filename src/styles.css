@@ -1457,8 +1457,8 @@ html[data-motion="reduced"] *::after {
   overflow-y: auto;
 }
 .renewal-hero {
-  background: linear-gradient(125deg, #13283f, #183b49);
-  color: #f3f7fd;
+  background: transparent;
+  color: var(--foreground);
   padding: clamp(24px, 4vw, 48px);
   border-radius: 18px;
 }
@@ -1471,13 +1471,13 @@ html[data-motion="reduced"] *::after {
   margin: 16px 0;
 }
 .renewal-hero > p {
-  color: #c8d8e8;
+  color: var(--muted-foreground);
   font-size: 16px;
 }
 .renewal-hero .section-kicker,
 .renewal-hero .source-reference a,
 .renewal-hero .source-reference small {
-  color: #a9eadd;
+  color: var(--primary);
 }
 .renewal-steps {
   display: flex;
