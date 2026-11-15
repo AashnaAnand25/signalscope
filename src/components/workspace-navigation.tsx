@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
+import { ospreyCase } from "@/data/osprey-case";
 import { campusBackpack } from "@/data/campus-backpack";
 const items = [
   { to: "/analytics", label: "Overview" },
@@ -39,7 +40,16 @@ export function WorkspaceNavigation() {
             onChange={(e) => {
               setProductId(e.target.value);
               void navigate({
-                to: e.target.value === campusBackpack.id ? "/analytics" : "/kearney",
+                to:
+                  e.target.value.startsWith("kearney-") ||
+                  [
+                    "velocity-ai",
+                    "tariff-simulator",
+                    "ingredient-compass",
+                    "perlab-design-to-value",
+                  ].includes(e.target.value)
+                    ? "/kearney"
+                    : "/analytics",
               });
             }}
           >
@@ -50,6 +60,15 @@ export function WorkspaceNavigation() {
             ))}
           </select>
         </label>
+        <button
+          className="sidebar-demo public-case-button"
+          onClick={() => {
+            setProductId(ospreyCase.id);
+            void navigate({ to: "/analytics" });
+          }}
+        >
+          Osprey public case <small>Real source-linked feedback</small>
+        </button>
         <button
           className="sidebar-demo"
           onClick={() => {

@@ -8,7 +8,7 @@ describe("Shared portfolio data architecture", () => {
     expect(PRODUCTS.some((p) => p.id === "campus-everyday-backpack")).toBe(true);
   });
   it("does not fabricate Kearney reviews or survey responses", () => {
-    for (const p of PRODUCTS.filter((p) => p.id !== "campus-everyday-backpack")) {
+    for (const p of PRODUCTS.filter((p) => KEARNEY_CATALOG.some((entry) => entry.id === p.id))) {
       expect(p.evidence).toEqual([]);
       expect(buildRecords(p, [], {}, [])).toEqual([]);
     }

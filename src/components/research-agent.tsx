@@ -99,6 +99,12 @@ export function ResearchAgent() {
   }
   function save() {
     if (!answer?.suggestions || !selected.length) return;
+    if (records.some((r) => r.text.trim() === text.trim() && r.sourceUrl === sourceUrl.trim())) {
+      setNotice(
+        "This passage is already in the product corpus. Review its tags in the Evidence library instead of counting it twice.",
+      );
+      return;
+    }
     try {
       const codings = answer.suggestions
         .filter((_, i) => selected.includes(i))
@@ -188,6 +194,43 @@ export function ResearchAgent() {
           </button>
         ))}
       </div>
+      {product.id === "osprey-daylite-plus-public" && (
+        <div className="flex flex-wrap gap-2 my-4">
+          <Button
+            variant="outline"
+            disabled={busy}
+            onClick={() => {
+              const r = records.find((x) => x.id === "ODP-14");
+              if (!r) return;
+              setMode("extract");
+              setText(r.text);
+              setSourceUrl(r.sourceUrl || "");
+              setSourceReference(r.sourceReference || "");
+              setSourceType("review");
+              setAnswer(null);
+              setNotice(
+                "Real source excerpt loaded. It is already counted in this corpus; this re-analysis does not add another customer record.",
+              );
+            }}
+          >
+            Use a real source excerpt
+          </Button>
+          <Button
+            variant="outline"
+            disabled={busy}
+            onClick={() => {
+              setMode("ask");
+              setText(
+                "Which strap-management issues recur in these records? Cite record IDs, include counterevidence and propose a product test.",
+              );
+              setAnswer(null);
+              setNotice("");
+            }}
+          >
+            Ask about this case
+          </Button>
+        </div>
+      )}
       <p className="text-sm text-muted-foreground">
         {mode === "extract"
           ? "Paste a permitted customer passage or a quoted excerpt from a Velocity export. The configured model suggests need tags; you decide what enters the dataset."

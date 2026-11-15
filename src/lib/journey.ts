@@ -494,6 +494,13 @@ export function buildJourney(records: EvidenceRecord[], responses: SurveyRespons
     },
   ];
 
+  if (responses.length === 0) {
+    for (const node of nodes) {
+      const hadSurvey = node.measures.some((m) => m.source === surveySrc);
+      node.measures = node.measures.filter((m) => m.source !== surveySrc);
+      if (hadSurvey) node.unavailable.push("No participant survey responses collected yet");
+    }
+  }
   return { nodes, transitions };
 }
 

@@ -1,0 +1,673 @@
+[
+  {
+    "id": "ODP-01",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I stopped by a local thrift store and found this Osprey Daylite plus bag for $12. I was looking for a day hiking bag for an upcoming international trip and I think this will work perfect. This thing is in excellent condition and looks brand new. Now I just need to get a hydration bladder. Any recommendations and does anyone have this bag?",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / Weak_Awareness_2088 / original post | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "purchase",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "Good condition of a second-hand pack",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "compatibility",
+        "need": "Find a compatible hydration bladder",
+        "fulfillment": "unknown",
+        "importance": "unknown"
+      },
+      {
+        "desire": "price",
+        "need": "Second-hand purchase at $12",
+        "fulfillment": "unknown",
+        "importance": "unknown",
+        "target": "$12 paid, not a stated budget"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-02",
+    "productId": "osprey-daylite-plus-public",
+    "text": "This pack holds some really large bottles and holds them very well",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / giantcappuccino | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "reliability",
+        "need": "Bottle retention",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "compatibility",
+        "need": "Fit large water bottles",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-03",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Regarding what hydration bladder to get, first check inside and see what kind of clip it has. A few years ago Osprey switched the hydration clip from a loop to this red rectangle thing that works best on Osprey's own hydration bladders (and I think HydraPak as well, since they're the ones that make Osprey's hydration bladders). You might be able to loop it in a way to hold up other brand hydration bladders as well, but it might take a bit of finagling.",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / not_vichyssoise / model-version claim unverified | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "compatibility",
+        "need": "Hydration-clip interoperability",
+        "fulfillment": "partly-met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Attach another brand of bladder",
+        "fulfillment": "partly-met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "workaround": "Poster suggests looping another bladder onto the clip. Compatibility is not independently verified."
+  },
+  {
+    "id": "ODP-04",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I have this pack and used a Camelbak \"Omega\" hydration bladder with the clip at top and it worked fine. It's a great pack. I like the ventilated back panel, water bottle pockets are decent sized, has a stash pocket. Negatives are the compression straps get in the way of the zipper track and wish the stash pocket didn't narrow towards the bottom. Some people don't like the integrated carry handle harness but it doesn't bother me. I use this as a weekend dad bag as a bag I'm not concerned about getting roughed up and for the occassional hiking trek. For travel, I prefer a bit more volume.",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / sentientmold / excerpt from one comment | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "compatibility",
+        "need": "Use Camelbak Omega bladder",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Open zipper without strap obstruction",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      },
+      {
+        "desire": "features",
+        "need": "Roomier stash pocket",
+        "fulfillment": "unmet",
+        "importance": "preference"
+      },
+      {
+        "desire": "convenience",
+        "need": "More volume for travel",
+        "fulfillment": "unmet",
+        "importance": "preference"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "barrier": "Compression straps obstruct zipper access."
+  },
+  {
+    "id": "ODP-05",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I have it and use it primarily for adventure traveling where I need a light bag. My wife still needs hers that's carry on them airplanes when we travel. Overall great bags very durable and very light.",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / -MaximumEffort- | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "Durable travel pack",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Low carry weight",
+        "fulfillment": "met",
+        "importance": "must-have",
+        "context": "Adventure travel"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-06",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I’ve been eyeing the daylight packs, both plus and regular one. You mentioned it being a carry on bag but I like the design of the plus more than the regular pack. By chance could one get away with using this as a personal bag. The measurements online read that it’s a little over 1 inch per the personal bag dimension guidelines.",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / Silver_Succotash_528 | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "qa",
+    "journey": "consideration",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "appearance",
+        "need": "Prefer Daylite Plus design",
+        "fulfillment": "unknown",
+        "importance": "preference"
+      },
+      {
+        "desire": "compatibility",
+        "need": "Meet personal-item dimensions",
+        "fulfillment": "unknown",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "answered": false,
+    "barrier": "Personal-item fit is uncertain; airline and pack version not specified."
+  },
+  {
+    "id": "ODP-07",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I actually use this bag as my main work bag for heading into the office. Carry is very comfortable: it handles my work stuff, a jacket and 2 insulated bottles without feeling rough on my shoulders! Whilst it does handle rain pretty well (Scottish weather and not had any major issues yet), I would recommend a rain cover if you're expecting to be out in the rain for a decent chunk of time for it as the fabric can soak up the water at times.",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / TheLilocean_B | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "Comfortable loaded carry",
+        "fulfillment": "met",
+        "importance": "unknown",
+        "context": "Office commute"
+      },
+      {
+        "desire": "reliability",
+        "need": "Protect contents in prolonged rain",
+        "fulfillment": "partly-met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "workaround": "Use a rain cover for extended rain exposure."
+  },
+  {
+    "id": "ODP-08",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Thank you. I want a laptop backpack lightweight for commuting. And I’m gonna be in a tropical environment where it can really downpour short periods of time throughout the day.",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / Beneficial_Wave_378 | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "qa",
+    "journey": "consideration",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "compatibility",
+        "need": "Carry a laptop",
+        "fulfillment": "unknown",
+        "importance": "preference"
+      },
+      {
+        "desire": "convenience",
+        "need": "Lightweight commute",
+        "fulfillment": "unknown",
+        "importance": "preference"
+      },
+      {
+        "desire": "reliability",
+        "need": "Cope with tropical downpours",
+        "fulfillment": "unknown",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "answered": false
+  },
+  {
+    "id": "ODP-09",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I have it, always come back to it for 1-day treks. It supports any hydration bladder you throw at it, I went with 3l decathlon and 3l evoc and it works like a charm",
+    "sourceUrl": "https://www.reddit.com/r/ManyBaggers/comments/1v876d4/osprey_daylite_plus/",
+    "sourceReference": "Reddit / fromage-du-omelette / compatibility claim not independently tested | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "compatibility",
+        "need": "Use Decathlon and Evoc 3L bladders",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-10",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Should I go for Osprey Daylite Plus (with 20L) or just go for a bigger one like the The North Face Women’s Jester (22L) or Women’s Borealis (27L)? Or do you have any other suggestions? I want something that would give me bigger capacity (up to 27L) without excess weight and bulkiness because I’m a petite person.",
+    "sourceUrl": "https://www.reddit.com/r/backpacks/comments/1guqqva/has_anyone_tried_the_osprey_daylite_plus_as_a_one/",
+    "sourceReference": "Reddit / m0no-no-aware / original post excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "qa",
+    "journey": "consideration",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "convenience",
+        "need": "More capacity without extra weight",
+        "fulfillment": "unknown",
+        "importance": "preference",
+        "target": "Up to 27L"
+      },
+      {
+        "desire": "appearance",
+        "need": "Avoid bulk on a petite frame",
+        "fulfillment": "unknown",
+        "importance": "preference",
+        "linkedWith": [
+          "convenience"
+        ]
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "answered": true
+  },
+  {
+    "id": "ODP-11",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I have personally used the osprey daylite plus and the straps would be more comfortable than your kanken. But I eventually switched to the Osprey Daylite 26+6L, which has an expandable main compartment. It's slightly wider and taller, but for someone relatively small for a guy at 5ft6 it's still quite comfortable to carry. In fact, it's more comfortable than the Daylite Plus.",
+    "sourceUrl": "https://www.reddit.com/r/backpacks/comments/1guqqva/has_anyone_tried_the_osprey_daylite_plus_as_a_one/",
+    "sourceReference": "Reddit / thevintagetart | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "after",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "More comfortable straps",
+        "fulfillment": "partly-met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Expandable main compartment",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-12",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Me! Ives used the 20L Daylite Plus for a year. For multiple trips (tropical) and it has been fine. For colder climates, I’ve bought a 26+6.",
+    "sourceUrl": "https://www.reddit.com/r/backpacks/comments/1guqqva/has_anyone_tried_the_osprey_daylite_plus_as_a_one/",
+    "sourceReference": "Reddit / Buddy_Bingo | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "convenience",
+        "need": "Capacity suited to trip conditions",
+        "fulfillment": "partly-met",
+        "importance": "unknown",
+        "context": "Tropical trips vs colder climates"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-13",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Right now I’m testing the Osprey Daylite Plus. I already own the 40L version and love it, so this seemed like a natural fit. Size-wise it’s perfect and about as big as I’d want to go, but the dangling straps are driving me crazy. I’m considering the Mystery Ranch Catalyst 18 next (really like the opening system), but I’m open to other options that are compact, comfortable, and clean-looking, nothing over 20L.",
+    "sourceUrl": "https://www.reddit.com/r/backpacks/comments/1opqaji",
+    "sourceReference": "Reddit / original poster / indexed original-post excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "discussion",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "convenience",
+        "need": "Manage dangling straps",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      },
+      {
+        "desire": "appearance",
+        "need": "Clean-looking compact pack",
+        "fulfillment": "partly-met",
+        "importance": "preference"
+      },
+      {
+        "desire": "quality",
+        "need": "Comfortable carry",
+        "fulfillment": "unknown",
+        "importance": "preference"
+      },
+      {
+        "desire": "convenience",
+        "need": "Stay at or below 20L",
+        "fulfillment": "met",
+        "importance": "must-have",
+        "target": "20L maximum"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2025-11-06",
+    "barrier": "Dangling straps prompt consideration of another pack."
+  },
+  {
+    "id": "ODP-14",
+    "productId": "osprey-daylite-plus-public",
+    "text": "all the straps that dangle from it. I used zip ties but I would expect more from the company.",
+    "sourceUrl": "https://www.scuba.com/osprey-daylite-plus-20l-backpack/p/osppde",
+    "sourceReference": "Scuba.com / William F. / Great bag / originally posted at Osprey / exact excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "convenience",
+        "need": "Secure excess strap webbing",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-07-16",
+    "workaround": "Reviewer reports securing dangling straps with zip ties."
+  },
+  {
+    "id": "ODP-15",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Very durable.",
+    "sourceUrl": "https://www.scuba.com/osprey-daylite-plus-20l-backpack/p/osppde",
+    "sourceReference": "Scuba.com / Scott L. / originally posted at Osprey / exact excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "Durability",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-07-12"
+  },
+  {
+    "id": "ODP-16",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Researcher summary: Janet reports comfortable travel carry but wants removable laptop padding to free clothing space.",
+    "sourceUrl": "https://www.scuba.com/osprey-daylite-plus-20l-backpack/p/osppde",
+    "sourceReference": "Scuba.com / Janet J. / paraphrase, not verbatim / originally posted at Osprey | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "customization",
+        "need": "Removable laptop padding",
+        "fulfillment": "unmet",
+        "importance": "preference"
+      },
+      {
+        "desire": "quality",
+        "need": "Comfortable carry",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Reclaim sleeve volume for clothing",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "ODP-17",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Researcher summary: Brad says an older pack could not be repaired and Osprey supplied a replacement.",
+    "sourceUrl": "https://www.scuba.com/osprey-daylite-plus-20l-backpack/p/osppde",
+    "sourceReference": "Scuba.com / Brad S. / paraphrase, not verbatim / originally posted at Osprey | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "support",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "reliability",
+        "need": "Support when an older pack cannot be repaired",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-09-24"
+  },
+  {
+    "id": "ODP-18",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Researcher summary: Wendy chose a discounted color and reports comfortable day-hike carry with adequate storage.",
+    "sourceUrl": "https://www.scuba.com/osprey-daylite-plus-20l-backpack/p/osppde",
+    "sourceReference": "Scuba.com / Wendy G. / paraphrase, not verbatim / originally posted at Osprey | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "purchase",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "price",
+        "need": "Discounted color influenced selection",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "appearance",
+        "need": "Liked chosen color",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "quality",
+        "need": "Comfortable fit",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-06-29"
+  },
+  {
+    "id": "ODP-19",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Researcher summary: Daniel bought the pack for pickleball paddles and accessories and reports convenient use.",
+    "sourceUrl": "https://www.scuba.com/osprey-daylite-plus-20l-backpack/p/osppde",
+    "sourceReference": "Scuba.com / Daniel D. / paraphrase, not verbatim / originally posted at Osprey | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "purchase",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "compatibility",
+        "need": "Carry pickleball equipment",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Access sports accessories",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-06-13"
+  },
+  {
+    "id": "ODP-20",
+    "productId": "osprey-daylite-plus-public",
+    "text": "The compression straps have to be unclipped first, which is a bit of a pain, but you get used to it.",
+    "sourceUrl": "https://packhacker.com/travel-gear/osprey/daylite-plus/",
+    "sourceReference": "Pack Hacker / editorial test / 2019 model / exact excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "mixed",
+    "codings": [
+      {
+        "desire": "convenience",
+        "need": "Open compartment without unclipping straps",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2019-03-14"
+  },
+  {
+    "id": "ODP-21",
+    "productId": "osprey-daylite-plus-public",
+    "text": "The shoulder straps continue this design, with the same ventilated pattern built in. They are thin and lightweight",
+    "sourceUrl": "https://nomadsnation.com/osprey-daylite-plus-review/",
+    "sourceReference": "Nomads Nation / editorial test / exact excerpt / model year not controlled | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "Ventilated shoulder straps",
+        "fulfillment": "met",
+        "importance": "unknown"
+      },
+      {
+        "desire": "convenience",
+        "need": "Light shoulder harness",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-22",
+    "productId": "osprey-daylite-plus-public",
+    "text": "I like that this strap is removable.",
+    "sourceUrl": "https://sectionhiker.com/osprey-daylite-plus-backpack-review/",
+    "sourceReference": "SectionHiker / editorial test / removable waist strap / exact excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "positive",
+    "codings": [
+      {
+        "desire": "customization",
+        "need": "Remove unused waist strap",
+        "fulfillment": "met",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected"
+  },
+  {
+    "id": "ODP-23",
+    "productId": "osprey-daylite-plus-public",
+    "text": "Shoulder straps don’t offer comfort with heavier loads",
+    "sourceUrl": "https://www.thisexpansiveadventure.com/blog/hiking/best-hiking-daypacks/osprey-daylite-plus/",
+    "sourceReference": "This Expansive Adventure / editorial test / exact excerpt | Public source snapshot checked 2026-11-15. Product revision not independently verified.",
+    "sourceType": "review",
+    "journey": "use",
+    "journeyBasis": "stated",
+    "tone": "negative",
+    "codings": [
+      {
+        "desire": "quality",
+        "need": "Comfort with heavier loads",
+        "fulfillment": "unmet",
+        "importance": "unknown"
+      }
+    ],
+    "classification": "self-reported",
+    "codingStatus": "ai-suggested",
+    "origin": "collected",
+    "date": "2026-03-16"
+  }
+]

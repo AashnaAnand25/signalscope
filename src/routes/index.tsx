@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, ArrowRight, Fingerprint, GitCompareArrows, Layers3 } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
-import { campusBackpack } from "@/data/campus-backpack";
+import { ospreyCase } from "@/data/osprey-case";
 import { SignalSculpture } from "@/components/signal-sculpture";
 export const Route = createFileRoute("/")({ component: Home });
 function Home() {
@@ -24,13 +24,15 @@ function Home() {
           </p>
           <Link
             to="/analytics"
-            onClick={() => setProductId(campusBackpack.id)}
+            onClick={() => setProductId(ospreyCase.id)}
             className="scope-cta hero-cta"
           >
             Try now
             <ArrowUpRight size={20} />
           </Link>
-          <small>No account needed. Start with the clearly labeled Backpack demo.</small>
+          <small>
+            No account needed. Explore a real backpack case with linked public feedback.
+          </small>
           <Link to="/kearney" className="landing-secondary">
             Explore Kearney products →
           </Link>
@@ -61,7 +63,7 @@ function Home() {
             n: "02",
             icon: GitCompareArrows,
             title: "See the alternatives",
-            text: "Discover relevant competitors automatically. Compare supported capabilities and make evidence gaps visible.",
+            text: "Compare alternatives using captured evidence. Make unsupported claims and missing information visible.",
           },
           {
             n: "03",

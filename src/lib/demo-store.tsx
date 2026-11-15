@@ -153,11 +153,17 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     setTrail((t) => (t[step] ? t : { ...t, [step]: true }));
   }, []);
 
+  const chooseProduct = useCallback((id: string) => {
+    setProductId(id);
+    setEvidenceFilters(EMPTY_FILTERS);
+    setDesireSource("all");
+  }, []);
+
   const value: Ctx = {
     hydrated,
     product,
     products: PRODUCTS,
-    setProductId,
+    setProductId: chooseProduct,
     responses,
     collectedResponses: collected.filter((r) => r.productId === product.id),
     records,

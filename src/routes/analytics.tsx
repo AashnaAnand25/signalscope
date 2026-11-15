@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, Database, MessagesSquare, ScanSearch, ShieldQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PublicCaseSummary } from "@/components/public-case-summary";
+import { PUBLIC_CASE_ID } from "@/data/osprey-case";
 import { ResearchAgent } from "@/components/research-agent";
 import { OpportunityDialog } from "@/components/pocket/opportunity";
 import { BackpackExplorer } from "@/components/pocket/backpack-explorer";
@@ -65,10 +67,17 @@ function Overview() {
         </Button>
       </div>
       <div className="scope-strip">
-        <strong>Backpack demo and product analysis</strong>
-        <span>Seeded records are fictional examples, not scraped reviews.</span>
+        <strong>
+          {product.id === PUBLIC_CASE_ID ? "Real public-feedback case" : "Product analysis"}
+        </strong>
+        <span>
+          {product.id === PUBLIC_CASE_ID
+            ? "Source-linked snapshot. All tabs use the same records."
+            : "Seeded records, where present, are fictional and labeled."}
+        </span>
         <Link to="/kearney">Open Kearney portfolio →</Link>
       </div>
+      <PublicCaseSummary />
       <div className="getting-started">
         <strong>New here?</strong>
         <span>1. Pick a need.</span>
@@ -238,7 +247,11 @@ function Overview() {
             <h2>{product.name}</h2>
             <p>{product.description}</p>
             <ul>
-              <li>Seeded evidence is fictional.</li>
+              <li>
+                {product.id === PUBLIC_CASE_ID
+                  ? "Public source snapshot with initial AI coding. No synthetic records in this case."
+                  : "Seeded evidence is fictional."}
+              </li>
               <li>Records, responses, people, and orders are different units.</li>
               <li>Unknown fulfillment is excluded from gap rates.</li>
               <li>Charts describe this collection only.</li>

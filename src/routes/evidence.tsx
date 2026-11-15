@@ -129,7 +129,7 @@ function EvidencePage() {
         guide={{
           points: [
             "Each card is one record: a passage (review, Q&A, discussion) or one survey response.",
-            "“Pre-coded demo tags” were written with the synthetic data. No AI analysis runs in this demo.",
+            "Pre-coded demo tags belong to fictional seed records. AI-suggested tags on collected passages need review.",
             "Use “Review tags” to correct desire tags; the record becomes human-reviewed and every count updates.",
             "Conflicting claims are shown side by side and stay unresolved until verified.",
           ],

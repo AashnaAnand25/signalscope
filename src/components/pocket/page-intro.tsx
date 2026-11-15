@@ -1,3 +1,4 @@
+import { useDemo } from "@/lib/demo-store";
 import { HelpCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -71,11 +72,15 @@ export function HowToRead({
 }
 
 export function SyntheticNotice({ className = "" }: { className?: string }) {
+  const { records } = useDemo();
+  const synthetic = records.filter((r) => r.origin === "synthetic-seed").length;
   return (
     <p
       className={`inline-flex items-center gap-2 rounded-full border-2 border-dashed border-lavender-strong/40 bg-lavender/70 px-3 py-1 text-xs font-semibold text-lavender-strong ${className}`}
     >
-      Synthetic demonstration evidence; not findings about a real product.
+      {synthetic > 0
+        ? `${synthetic} synthetic demonstration records, labeled separately from collected evidence.`
+        : "Source-linked collected evidence. Initial tags need reviewer checks."}
     </p>
   );
 }

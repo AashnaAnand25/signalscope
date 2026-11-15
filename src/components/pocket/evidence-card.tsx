@@ -136,7 +136,8 @@ export function EvidenceCard({
             rel="noreferrer"
             className="inline-flex items-center gap-1 underline"
           >
-            Source <ExternalLink className="size-3" />
+            Source: PERLab / {new URL(record.sourceUrl).hostname.replace(/^www\./, "")}{" "}
+            <ExternalLink className="size-3" />
           </a>
         ) : record.sourceReference ? (
           <span>Source: {record.sourceReference}</span>
@@ -144,6 +145,9 @@ export function EvidenceCard({
           <span>
             {record.origin === "synthetic-seed" ? "Synthetic example" : "Source unavailable"}
           </span>
+        )}
+        {record.sourceUrl && record.sourceReference && (
+          <span className="w-full leading-relaxed">{record.sourceReference}</span>
         )}
         {onEditTags && (
           <Button

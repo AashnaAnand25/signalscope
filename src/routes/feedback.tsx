@@ -84,8 +84,8 @@ function Feedback() {
       />
       <div className="workspace-notice">
         Local demonstration: answers stay in this browser. A response on another device will not
-        update this dashboard. The current demo product is fictional; its seeded experiences are
-        synthetic. We collect no name or email.
+        update this dashboard. Public source records and new survey responses remain separate.
+        Fictional seed records, where present, are labeled synthetic. We collect no name or email.
       </div>
       {done ? (
         <section className="rounded-xl border bg-white p-8">
